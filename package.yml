@@ -1,0 +1,9 @@
+package: yform/geo_osm
+version: '1.0'
+author: 'Friends Of REDAXO'
+supportpage: www.redaxo.org/de/forum/
+
+
+requires:
+    packages:
+        yform/manager: '^2.0-beta2'
