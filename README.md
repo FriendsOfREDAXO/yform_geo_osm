@@ -1,6 +1,8 @@
 YForm Plugin: Geo (OSM)
 =============
 
+![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/yform_geo_osm/master/assets/preview.png)
+
 * YForm Plugin für die Einbindung einer Geocoding-Funktion basierend auf Openstreetmaps.
 * Anpassung der Geo-Daten über Map-Marker möglich
 * Openstreetmaps (Karte), optional Mapbox (Karte + Satellit)
