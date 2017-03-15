@@ -1,8 +1,7 @@
 <?php
 
 if (rex::isBackend() && rex::getUser()) {
-
-	rex_yform::addTemplatePath(rex_path::plugin('yform','geo_osm','ytemplates'));
+	rex_yform::addTemplatePath(rex_path::addon('yform_geo_osm', 'ytemplates'));
 
 	rex_view::addJsFile($this->getAssetsUrl('leaflet/leaflet.js'));
 	rex_view::addCssFile($this->getAssetsUrl('leaflet/leaflet.css'));

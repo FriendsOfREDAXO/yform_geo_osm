@@ -5,7 +5,6 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 
     function enterObject()
     {
-
         $addressfields = explode(',', str_replace(" ", "", $this->getElement('address')));
         $geofields = explode(',', str_replace(" ", "", $this->getElement('latlng')));
         $height = intval($this->getElement('height'));
