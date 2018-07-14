@@ -22,7 +22,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
 
     if(mapbox_token=='') {
         var map = L.map('map-'+id).setView([current_lat, current_lng], 16);
-        L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
     }
