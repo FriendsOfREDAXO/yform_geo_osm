@@ -17,6 +17,9 @@ Installation
 Changelog
 -------
 
+### Version 1.1.1 // 15.07.2018
+Deutschen Tile-Server eingebunden
+
 ### Version 1.1 // 11.03.2017
 
 * Umstellung auf eigenständiges AddOn
