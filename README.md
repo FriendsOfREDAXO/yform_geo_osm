@@ -17,8 +17,11 @@ Installation
 Changelog
 -------
 
+### Version 1.1.2 // 14.02.2019
+Versionsabhängikeit für YForm 3 korrigiert @skerbis
+
 ### Version 1.1.1 // 15.07.2018
-Deutschen Tile-Server eingebunden
+Deutschen Tile-Server eingebunden @skerbis
 
 ### Version 1.1 // 11.03.2017
 
