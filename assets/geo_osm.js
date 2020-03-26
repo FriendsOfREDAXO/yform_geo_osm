@@ -77,22 +77,26 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             return true;
         }
 
-        $.getJSON('//nominatim.openstreetmap.org/search?street='+street+'&city='+city+'&postalcode='+postalcode+'&format=json&polygon=0&addressdetails=0&limit=1')
-            .done(function( json ) {
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                var json = JSON.parse(xhr.response);
                 if(json.length==0) {
                     alert('Adresse nicht gefunden.')
                     return false;
                 }
                 $(geofields.lat).val(json[0].lat);
                 $(geofields.lng).val(json[0].lon);
-
                 setTimeout(function(){
                     $(geofields.lat).keyup();
                 }, 200);
-            })
-            .fail(function( jqxhr, textStatus, error ) {
-                alert('Es trat ein Fehler auf.');
-            });
+            } else {
+                console.log('Es trat ein Fehler auf.');
+            }
+        };
+        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?street='+street+'&city='+city+'&postalcode='+postalcode+'&format=json&polygon=0&addressdetails=0&limit=1');
+        xhr.send();
 
     })
 }

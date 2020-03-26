@@ -14,14 +14,58 @@ Installation
 * Paket herunterladen oder über den Installer installieren
 
 
+Beispielmodul (Ausgabe) YForm Frontend
+-------
+
+```php
+
+<?php
+
+	rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addAssets');
+
+	$yform = new rex_yform();
+
+	$yform->setObjectparams('form_name', 'table-rex_geotest');
+	$yform->setObjectparams('form_action',rex_getUrl('REX_ARTICLE_ID'));
+	$yform->setObjectparams('form_ytemplate', 'bootstrap');
+	$yform->setObjectparams('form_showformafterupdate', 0);
+	$yform->setObjectparams('real_field_names', true);
+
+	$yform->setValueField('text', array('street','Straße','','0'));
+	$yform->setValueField('text', array('postalcode','PLZ','','0'));
+	$yform->setValueField('text', array('city','Ort','','0'));
+	$yform->setValueField('number', array('lat','LAT','10','8','','0'));
+	$yform->setValueField('number', array('lng','LNG','11','8','','0'));
+	$yform->setValueField('osm_geocode', array('osm','OSM','lat,lng','street,postalcode,city','500'));
+
+	$yform->setActionField('tpl2email', array('emailtemplate', 'emaillabel', 'email@domain.de'));
+	echo $yform->getForm();
+
+?>
+
+```
+
+
 Changelog
 -------
 
+### Version 1.2.1 // 10.03.2020 
+
+* Anpassung Einbindung Assets + JS Code im Frontend (OUTPUT_FILTER)
+
+### Version 1.2.0 // 09.03.2020 
+
+* Bugfix #6
+* Anpassungen für Verwendung im Frontend
+* Beispielcode "YForm Frontend"
+
 ### Version 1.1.2 // 14.02.2019
-Versionsabhängikeit für YForm 3 korrigiert @skerbis
+
+* Versionsabhängikeit für YForm 3 korrigiert @skerbis
 
 ### Version 1.1.1 // 15.07.2018
-Deutschen Tile-Server eingebunden @skerbis
+
+* Deutschen Tile-Server eingebunden @skerbis
 
 ### Version 1.1 // 11.03.2017
 
