@@ -35,6 +35,6 @@ rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addDynJs', rex_extensio
 <div class="<?php echo $class_group ?>" id="<?php echo $this->getHTMLId('osm') ?>">
     <label class="<?php echo $class_label ?>"><?php echo $this->getElement('label') ?></label>
 
-    <br><button class="btn" id="set-geo-<?=$this->getId()?>" class="set"><?=rex_i18n::msg('yform_geo_osm_set_data');?></button>
+    <br><button class="btn set" id="set-geo-<?=$this->getId()?>" type="button"><?=rex_i18n::msg('yform_geo_osm_set_data');?></button>
     <div id="map-<?=$this->getId()?>" style="height:<?=$height;?>px; margin-top:5px;"></div>
 </div>
