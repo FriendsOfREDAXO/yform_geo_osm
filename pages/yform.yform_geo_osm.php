@@ -83,8 +83,6 @@ $fragment->setVar('flush', true);
 $fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
-$content .= '</fieldset>';
-
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit');
 $fragment->setVar('title', 'OSM Geocodierung');
@@ -175,10 +173,13 @@ if ($table) {
         exit;
     }    
     
-    
     foreach ($fields as $k => $v) {
-        $content .= '<p><a class="btn btn-setup" href="javascript:osm_geo_updates(\'' . $table['table_name'] . '\',\'' . $k . '\')">Google Geotagging starten</a> &nbsp;Hiermit werden alle Datensätze anhand des Felder "' . $k . '" nach fehlenden Geopositionen durchsucht und neu gesetzt. <br /><br />[<span id="osm_geo_count_' . $k . '"></span>]</p>';
+        $content .= '<p><a class="btn btn-setup" href="javascript:osm_geo_updates(\'' . $table['table_name'] . '\',\'' . $k . '\')">Google Geotagging starten</a> &nbsp;Hiermit werden alle Datensätze anhand des Felder "' . $k . '" nach fehlenden Geopositionen durchsucht und neu gesetzt.</p>'
+                . '<p>[<span id="osm_geo_count_' . $k . '"></span>]</p>';
     }
+    
+    $content .= '</fieldset>';
+    
     echo $content;
    
 }
@@ -189,7 +190,7 @@ if ($table) {
     
     var data_counter = 0;
     var data_running = 0;
-    var data_next = 0;
+    var data_next = -1;
     var data = "";
     var table = "";
     var field = "";
@@ -252,7 +253,7 @@ if ($table) {
             jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+"<a href=\"index.php?page=yform/manager/data_edit&table_name="+table+"&data_id="+data_id+"&func=edit&start=\">Geocoding not possible, try manually [id=\""+data_id+"\"]</a>");
             // return false;
         }
-//        setTimeout("osm_geo_update()",1000);
+        setTimeout("osm_geo_update()",300);
 
     }
     
