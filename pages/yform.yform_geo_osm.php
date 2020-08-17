@@ -253,7 +253,7 @@ if ($table) {
             jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+"<a href=\"index.php?page=yform/manager/data_edit&table_name="+table+"&data_id="+data_id+"&func=edit&start=\">Geocoding not possible, try manually [id=\""+data_id+"\"]</a>");
             // return false;
         }
-        setTimeout("osm_geo_update()",300);
+        setTimeout("osm_geo_update()",1000);
 
     }
     
