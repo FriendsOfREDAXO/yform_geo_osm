@@ -45,9 +45,19 @@ Beispielmodul (Ausgabe) YForm Frontend
 
 ```
 
+Massencodierung
+-------
+
+Die Massencodierung wird im yform Reiter Geo OSM eingestellt und gestartet. Auf der Einstellungsseite erscheinen Tabellen zur Auswahl, die ein Geocode Feld aus yform_geo_osm haben. Für die Codierung ist ein Key von Geoapify notwendig. Der Key wird in das entsprechende Feld eingetragen, dann kann es los gehen. Bitte die Lizenzbestimmungen zu Geoapify beachten. Die Massencodierung berücksichtigt die Einstellungen des yform_geo_osm-Feldes. Es werden jeweils Adresshäppchen à 200 Adressen codiert. Es werden nur solche Adressen codiert, die noch keinen Geocode Eintrag haben.
+
+
 
 Changelog
 -------
+
+### Version 1.2.2 // 17.08.2020 
+
+* Massencodierung über Geoapify hinzugefügt (dtpop)
 
 ### Version 1.2.1 // 10.03.2020 
 
@@ -80,6 +90,7 @@ Credits
 -------
 
 * Polarpixel - Peter Bickel (Testing / Ideen)
+* Wolfgang Bund - Massencodierung
 * Leaflet
 * Openstreetmaps
 * Mapbox

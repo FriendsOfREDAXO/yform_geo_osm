@@ -7,3 +7,10 @@ supportpage: https://github.com/FriendsOfREDAXO/yform_geo_osm
 requires:
     packages:
         yform/manager: '>=2,<4'
+
+page:
+    hidden: true
+
+pages:
+    yform/yform_geo_osm:
+        title: 'Geo Osm'
