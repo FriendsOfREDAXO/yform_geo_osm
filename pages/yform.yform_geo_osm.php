@@ -197,6 +197,7 @@ if ($table) {
     var data_id = 0;
     var latitude = 0;
     var longitude = 0;
+    var locked = 0;
     
     function osm_geo_updates(tablename,fieldname) {
         if(data_running == 1) return false;
@@ -234,13 +235,12 @@ if ($table) {
 //        get_geocode_link = 'https://api.nettoolkit.com/v1/geo/geocodes?address='+address+'&key=test_RXNtAxEJzQHkLiorg1wEmVyzirqlsxQYS4gDncPl';
 
         get_geocode_link = 'https://api.geoapify.com/v1/geocode/search?text='+address+'&limit=1&apiKey=<?= $addon->getConfig('geoapifykey') ?>';
+        locked = 1;
 
-        console.log(get_geocode_link);        
         jQuery.ajax({
             dataType: "json",
             url: get_geocode_link,
             success: function(gdata) {
-                console.log(gdata.features[0].properties);
                 latitude = gdata.features[0].properties.lat;
                 longitude = gdata.features[0].properties.lon;
                 save_data();
@@ -253,9 +253,21 @@ if ($table) {
             jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+"<a href=\"index.php?page=yform/manager/data_edit&table_name="+table+"&data_id="+data_id+"&func=edit&start=\">Geocoding not possible, try manually [id=\""+data_id+"\"]</a>");
             // return false;
         }
-        setTimeout("osm_geo_update()",1000);
+        
+        
+//        setTimeout("osm_geo_update()",1000);
+        waitForReady();
 
     }
+    
+    
+    function waitForReady() {
+        if(locked == 0) {
+            osm_geo_update();
+        } else {
+            setTimeout('waitForReady()', 50);
+        }
+    }    
     
     
     function save_data () {
@@ -264,7 +276,6 @@ if ($table) {
         lon = longitude;
         
         data_link = "index.php?page=yform/yform_geo_osm/&osm-geo-table="+table+"&geo_func=save_data&geo_field="+field+"&geo_lng="+lon+"&geo_lat="+lat+"&geo_id="+data_id;
-        console.log(data_link);
         
         jQuery.ajax({
             url: data_link,
@@ -272,6 +283,7 @@ if ($table) {
                 if(data_status == "1") {
                     jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+". ");
                     data_next = "1";
+                    locked = false;
                 }else {
                     // alert("data status" + data_status);
                 }
