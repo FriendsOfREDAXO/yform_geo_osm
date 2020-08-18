@@ -175,7 +175,7 @@ if ($table) {
     
     foreach ($fields as $k => $v) {
         $content .= '<p><a class="btn btn-setup" href="javascript:osm_geo_updates(\'' . $table['table_name'] . '\',\'' . $k . '\')">Google Geotagging starten</a> &nbsp;Hiermit werden alle Datensätze anhand des Felder "' . $k . '" nach fehlenden Geopositionen durchsucht und neu gesetzt.</p>'
-                . '<p>[<span id="osm_geo_count_' . $k . '"></span>]</p>';
+                . '<div class="status_output" id="osm_geo_count_' . $k . '"></div>';
     }
     
     $content .= '</fieldset>';
@@ -244,6 +244,9 @@ if ($table) {
                 latitude = gdata.features[0].properties.lat;
                 longitude = gdata.features[0].properties.lon;
                 save_data();
+            },
+            error: function() {
+                jQuery("#osm_geo_count_"+field).prepend('<?= \rex_view::error('Anfrage blockiert oder Netzwerkfehler.') ?>');                
             }
         });
 
@@ -275,16 +278,20 @@ if ($table) {
         lat = latitude;
         lon = longitude;
         
+        outtext = '<?= \rex_view::success('===placeholder===') ?>';
+        
         data_link = "index.php?page=yform/yform_geo_osm/&osm-geo-table="+table+"&geo_func=save_data&geo_field="+field+"&geo_lng="+lon+"&geo_lat="+lat+"&geo_id="+data_id;
         
         jQuery.ajax({
             url: data_link,
             success: function(data_status){
                 if(data_status == "1") {
-                    jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+". ");
+                    jQuery("#osm_geo_count_"+field).prepend(outtext.replace('===placeholder===','Id: '+data_id+' - '+data[data_counter]["address"]) );
+//                    jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+". ");
                     data_next = "1";
                     locked = false;
                 }else {
+                    jQuery("#osm_geo_count_"+field).prepend('<?= \rex_view::error('Konfigurationsfehler. Daten wurden nicht gespeichert.') ?>');                    
                     // alert("data status" + data_status);
                 }
             }
@@ -293,3 +300,9 @@ if ($table) {
     
     
 </script>
+<style>
+    .status_output {
+        max-height: 50vh;
+        overflow-y: scroll;
+    }   
+</style>
