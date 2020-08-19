@@ -55,9 +55,11 @@ Die Massencodierung wird im yform Reiter Geo OSM eingestellt und gestartet. Auf 
 Changelog
 -------
 
-### Version 1.2.2 // 17.08.2020 
+### Version 1.2.3 // 17.08.2020 
 
 * Massencodierung über Geoapify hinzugefügt (dtpop)
+
+### Version 1.2.2 // 24.04.2020
 
 ### Version 1.2.1 // 10.03.2020 
 
