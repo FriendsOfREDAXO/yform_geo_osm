@@ -14,3 +14,4 @@ page:
 pages:
     yform/yform_geo_osm:
         title: 'Geo Osm'
+        perm: admin[]
