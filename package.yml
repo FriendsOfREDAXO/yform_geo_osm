@@ -5,7 +5,7 @@ supportpage: https://github.com/FriendsOfREDAXO/yform_geo_osm
 
 requires:
     packages:
-        yform/manager: '>=2,<4'
+        yform/manager: '>=2'
     redaxo: '^5.12'
     php:
         version: '>=7.2, <9'
