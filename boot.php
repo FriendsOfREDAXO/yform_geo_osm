@@ -1,7 +1,7 @@
 <?php
+rex_yform::addTemplatePath(rex_path::addon('yform_geo_osm', 'ytemplates'));
 
 if (rex::isBackend() && rex::getUser()) {
-    rex_yform::addTemplatePath(rex_path::addon('yform_geo_osm', 'ytemplates'));
 	// Assets nur laden wenn geolocation addon nicht verfügbar. 
 	if (!rex_addon::get('geolocation')->isAvailable()) {
            rex_view::addJsFile($this->getAssetsUrl('leaflet/leaflet.js'));
