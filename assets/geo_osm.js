@@ -19,6 +19,14 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
 
     // Karte laden
 
+    /*
+     * Store a reference of the Leaflet map object on the map container,
+     * so that it could be retrieved from DOM selection.
+     * https://leafletjs.com/reference-1.3.4.html#map-getcontainer
+     */
+    L.Map.addInitHook(function () {
+        this.getContainer()._leaflet_map = this;
+    });
 
     if(mapbox_token=='') {
         var map = L.map('map-'+id).setView([current_lat, current_lng], 16);
