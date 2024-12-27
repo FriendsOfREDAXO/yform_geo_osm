@@ -34,7 +34,7 @@ class geo_search {
             ['table' => $table, 'lat_field' => $latField, 'lng_field' => $lngField]
         );
         $instance->addressFields = $addressFields;
-        $instance->apiKey = $apiKey;
+        $instance->apiKey = $instance->getApiKey($apiKey);
         $instance->batchSize = $batchSize;
         return $instance;
     }
@@ -48,8 +48,19 @@ class geo_search {
             ['table' => '', 'lat_field' => '', 'lng_field' => '', 'postalcode_field' => ''],
             ['table' => '', 'lat_field' => '', 'lng_field' => '']
         );
-        $instance->apiKey = $apiKey;
+        $instance->apiKey = $instance->getApiKey($apiKey);
         return $instance;
+    }
+
+    /**
+     * Get API key from config if 'config' is passed, otherwise return the provided key
+     */
+    private function getApiKey($key) 
+    {
+        if ($key === 'config') {
+            return rex_addon::get('yform_geo_osm')->getConfig('geoapifykey');
+        }
+        return $key;
     }
 
     /**
