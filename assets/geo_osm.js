@@ -88,28 +88,55 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         }
     });
 
-    function performSearch(searchText) {
-        if(searchText.trim() === '') return;
+    let searchTimeout;
 
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                var json = JSON.parse(xhr.response);
-                if(json.length==0) {
-                    alert('Address not found')
-                    return false;
+    function performSearch(searchText) {
+        if(searchText.trim() === '') {
+            $('#rex-geo-search-results-'+id).empty();
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var json = JSON.parse(xhr.response);
+                    displaySearchResults(json);
+                } else {
+                    console.log('An error occurred.');
                 }
-                $(geofields.lat).val(json[0].lat);
-                $(geofields.lng).val(json[0].lon);
-                map.setView([json[0].lat, json[0].lon], 16);
-                marker.setLatLng([json[0].lat, json[0].lon]);
-                $('#rex-geo-search-modal-'+id).hide();
-            } else {
-                console.log('An error occurred.');
-            }
-        };
-        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(searchText)+'&format=json&polygon=0&addressdetails=0&limit=1');
-        xhr.send();
+            };
+            xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(searchText)+'&format=json&polygon=0&addressdetails=1&limit=5');
+            xhr.send();
+        }, 300);
+    }
+
+    function displaySearchResults(results) {
+        const resultsContainer = $('#rex-geo-search-results-'+id);
+        resultsContainer.empty();
+
+        if(results.length === 0) {
+            resultsContainer.append('<div class="search-result">No results found</div>');
+            return;
+        }
+
+        results.forEach(result => {
+            const resultDiv = $('<div class="search-result"></div>');
+            resultDiv.text(result.display_name);
+            resultDiv.on('click', () => selectLocation(result));
+            resultsContainer.append(resultDiv);
+        });
+    }
+
+    function selectLocation(location) {
+        $(geofields.lat).val(location.lat);
+        $(geofields.lng).val(location.lon);
+        map.setView([location.lat, location.lon], 16);
+        marker.setLatLng([location.lat, location.lon]);
+        $('#rex-geo-search-modal-'+id).hide();
+        $('#rex-geo-search-input-'+id).val('');
+        $('#rex-geo-search-results-'+id).empty();
     }
 
     // Browser geolocation
