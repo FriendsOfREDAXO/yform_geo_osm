@@ -1,3 +1,7 @@
 yform_geo_osm = Geo (OSM)
 yform_geo_osm_overview = Geo (OSM) Übersicht
-yform_geo_osm_set_data = Geo-Koordinaten anhand von Adressdaten ermitteln
+yform_geo_osm_get_coords = Koordinaten von Adresse ermitteln
+yform_geo_osm_search_address = Adresse suchen
+yform_geo_osm_get_location = Meinen Standort übernehmen
+yform_geo_osm_search = Suchen
+yform_geo_osm_search_placeholder = Adresse eingeben...

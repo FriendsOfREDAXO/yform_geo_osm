@@ -1,6 +1,6 @@
 function rex_geo_osm_get_address(addressfields) {
     var out = [];
-    for(var i=0;i<addressfields.length;i++) {
+    for(var i=0; i<addressfields.length; i++) {
         if($(addressfields[i]).val()!='')
             out.push($(addressfields[i]).val());
     }
@@ -8,55 +8,43 @@ function rex_geo_osm_get_address(addressfields) {
 }
 
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
-    /*
-     * adressfields (arr - strasse/plz/ort)
-     * geofield (obj - lat/lng)
-     */
+    var current_lat = $(geofields.lat).val() || 51.1657;
+    var current_lng = $(geofields.lng).val() || 10.4515;
 
-
-    var current_lat = $(geofields.lat).val();
-    var current_lng = $(geofields.lng).val();
-
-    // Karte laden
-
-    /*
-     * Store a reference of the Leaflet map object on the map container,
-     * so that it could be retrieved from DOM selection.
-     * https://leafletjs.com/reference-1.3.4.html#map-getcontainer
-     */
     L.Map.addInitHook(function () {
         this.getContainer()._leaflet_map = this;
     });
 
+    // Map initialization
+    var map;
     if(mapbox_token=='') {
-        var map = L.map('map-'+id).setView([current_lat, current_lng], 16);
+        map = L.map('map-'+id).setView([current_lat, current_lng], 16);
         L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-    }
-    else {
-
+    } else {
         var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
             'Imagery © <a href="http://mapbox.com">Mapbox</a>';
 
-        var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, {id: 'mapbox.streets', attribution: mapboxAttribution}),
-            streets_sattelite   = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
+        var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
+            {id: 'mapbox.streets', attribution: mapboxAttribution}),
+            streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
+            {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-        var map = L.map('map-'+id, {
+        map = L.map('map-'+id, {
             center: [current_lat, current_lng],
             zoom: 16,
             layers: [streets, streets_sattelite]
         });
 
         var baseMaps = {
-            "Karte": streets,
-            "Satellit": streets_sattelite
+            "Map": streets,
+            "Satellite": streets_sattelite
         };
 
         L.control.layers(baseMaps).addTo(map);
     }
-
 
     var marker = L.marker([current_lat, current_lng], {
         draggable: true
@@ -69,10 +57,96 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     $(geofields.lat+','+geofields.lng).on('keyup', function() {
         var lat = $(geofields.lat).val();
         var lng = $(geofields.lng).val();
-        map.setView([lat, lng, 16]);
+        map.setView([lat, lng], 16);
         marker.setLatLng([lat, lng]);
     });
 
+    // Show/hide search modal
+    $('#search-geo-'+id).on('click', function() {
+        $('#rex-geo-search-modal-'+id).show();
+        $('#rex-geo-search-input-'+id).focus();
+    });
+
+    $('.rex-geo-search-close').on('click', function() {
+        $(this).closest('.rex-geo-search-modal').hide();
+    });
+
+    // Live search
+    $('#rex-geo-search-input-'+id).on('input', function(e) {
+        e.preventDefault();
+        performSearch($(this).val());
+    });
+
+    let searchTimeout;
+
+    function performSearch(searchText) {
+        if(searchText.trim() === '') {
+            $('#rex-geo-search-results-'+id).empty();
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var json = JSON.parse(xhr.response);
+                    displaySearchResults(json);
+                } else {
+                    console.log('An error occurred.');
+                }
+            };
+            xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(searchText)+'&format=json&polygon=0&addressdetails=1&limit=5');
+            xhr.send();
+        }, 300);
+    }
+
+    function displaySearchResults(results) {
+        const resultsContainer = $('#rex-geo-search-results-'+id);
+        resultsContainer.empty();
+
+        if(results.length === 0) {
+            resultsContainer.append('<div class="search-result">No results found</div>');
+            return;
+        }
+
+        results.forEach(result => {
+            const resultDiv = $('<div class="search-result"></div>');
+            resultDiv.text(result.display_name);
+            resultDiv.on('click', () => selectLocation(result));
+            resultsContainer.append(resultDiv);
+        });
+    }
+
+    function selectLocation(location) {
+        $(geofields.lat).val(location.lat);
+        $(geofields.lng).val(location.lon);
+        map.setView([location.lat, location.lon], 16);
+        marker.setLatLng([location.lat, location.lon]);
+        $('#rex-geo-search-modal-'+id).hide();
+        $('#rex-geo-search-input-'+id).val('');
+        $('#rex-geo-search-results-'+id).empty();
+    }
+
+    // Browser geolocation
+    $('#browser-geo-'+id).on('click', function() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                $(geofields.lat).val(lat);
+                $(geofields.lng).val(lng);
+                map.setView([lat, lng], 16);
+                marker.setLatLng([lat, lng]);
+            }, function(error) {
+                alert("Geolocation failed: " + error.message);
+            });
+        } else {
+            alert("Your browser doesn't support geolocation.");
+        }
+    });
+
+    // Original address geocoding
     $('#set-geo-'+id).on('click', function(e) {
         e.preventDefault();
 
@@ -81,30 +155,27 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         var postalcode = $(addressfields[1]).val();
 
         if(street=='' || city=='' || postalcode == '') {
-            alert('Bitte vorerst die Adresse vollständig ausfüllen.');
+            alert('Please fill in the complete address first.');
             return true;
         }
-
 
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 var json = JSON.parse(xhr.response);
                 if(json.length==0) {
-                    alert('Adresse nicht gefunden.')
+                    alert('Address not found')
                     return false;
                 }
                 $(geofields.lat).val(json[0].lat);
                 $(geofields.lng).val(json[0].lon);
-                setTimeout(function(){
-                    $(geofields.lat).keyup();
-                }, 200);
+                map.setView([json[0].lat, json[0].lon], 16);
+                marker.setLatLng([json[0].lat, json[0].lon]);
             } else {
-                console.log('Es trat ein Fehler auf.');
+                console.log('An error occurred.');
             }
         };
-        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?street='+street+'&city='+city+'&postalcode='+postalcode+'&format=json&polygon=0&addressdetails=0&limit=1');
+        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(street+' '+city+' '+postalcode)+'&format=json&polygon=0&addressdetails=0&limit=1');
         xhr.send();
-
-    })
+    });
 }
