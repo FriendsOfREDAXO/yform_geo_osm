@@ -1,3 +1,29 @@
+:root {
+    --rex-geo-background: #fff;
+    --rex-geo-background-hover: #f8f9fa;
+    --rex-geo-text: #212529;
+    --rex-geo-border: #dee2e6;
+    --rex-geo-input-bg: #fff;
+    --rex-geo-input-text: #212529;
+    --rex-geo-input-border: #dee2e6;
+    --rex-geo-shadow: rgba(0,0,0,0.1);
+    --rex-geo-primary: #2196F3;
+    --rex-geo-primary-hover: #1e87db;
+    --rex-geo-success: #4CAF50;
+    --rex-geo-success-hover: #45a049;
+}
+
+body.rex-theme-dark {
+    --rex-geo-background: #32373c;
+    --rex-geo-background-hover: #3c4146;
+    --rex-geo-text: #fff;
+    --rex-geo-border: #404448;
+    --rex-geo-input-bg: #282c30;
+    --rex-geo-input-text: #fff;
+    --rex-geo-input-border: #404448;
+    --rex-geo-shadow: rgba(0,0,0,0.3);
+}
+
 .rex-geo-search-modal {
     display: none;
     position: fixed;
@@ -10,21 +36,16 @@
 }
 
 .rex-geo-search-content {
-    background: var(--bs-body-bg);
+    background-color: var(--rex-geo-background);
+    color: var(--rex-geo-text);
     margin: 10% auto;
     padding: 30px;
     border-radius: 8px;
     width: 90%;
     max-width: 800px;
     position: relative;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    color: var(--bs-body-color);
-}
-
-body.rex-theme-dark .rex-geo-search-content {
-    background: var(--bs-body-bg);
-    color: var(--bs-body-color);
-    border: 1px solid var(--bs-border-color);
+    box-shadow: 0 4px 6px var(--rex-geo-shadow);
+    border: 1px solid var(--rex-geo-border);
 }
 
 .rex-geo-search-close {
@@ -34,7 +55,7 @@ body.rex-theme-dark .rex-geo-search-content {
     font-size: 28px;
     cursor: pointer;
     opacity: 0.7;
-    color: var(--bs-body-color);
+    color: var(--rex-geo-text);
 }
 
 .rex-geo-search-close:hover {
@@ -50,17 +71,17 @@ body.rex-theme-dark .rex-geo-search-content {
     width: 100%;
     font-size: 24px !important;
     padding: 15px !important;
-    border: 2px solid var(--bs-border-color) !important;
+    border: 2px solid var(--rex-geo-input-border) !important;
     border-radius: 8px !important;
     height: auto !important;
-    background: var(--bs-body-bg) !important;
-    color: var(--bs-body-color) !important;
+    background-color: var(--rex-geo-input-bg) !important;
+    color: var(--rex-geo-input-text) !important;
 }
 
 .rex-geo-search-input:focus {
-    border-color: var(--bs-primary) !important;
+    border-color: var(--rex-geo-primary) !important;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
 }
 
 .search-results {
@@ -73,17 +94,14 @@ body.rex-theme-dark .rex-geo-search-content {
 .search-result {
     padding: 12px 15px;
     cursor: pointer;
-    border-bottom: 1px solid var(--bs-border-color);
+    border-bottom: 1px solid var(--rex-geo-border);
     transition: background-color 0.2s ease;
     font-size: 16px;
+    color: var(--rex-geo-text);
 }
 
 .search-result:hover {
-    background: var(--bs-tertiary-bg);
-}
-
-body.rex-theme-dark .search-result:hover {
-    background: var(--bs-tertiary-bg);
+    background-color: var(--rex-geo-background-hover);
 }
 
 .btn-group {
@@ -95,29 +113,25 @@ body.rex-theme-dark .search-result:hover {
 }
 
 .btn.browser-location {
-    background-color: var(--bs-success);
-    border-color: var(--bs-success);
+    background-color: var(--rex-geo-success);
+    border-color: var(--rex-geo-success);
+    color: #fff;
 }
 
 .btn.browser-location:hover {
-    background-color: var(--bs-success-emphasis);
-    border-color: var(--bs-success-emphasis);
+    background-color: var(--rex-geo-success-hover);
+    border-color: var(--rex-geo-success-hover);
 }
 
 .btn.search, 
 .btn.set {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+    background-color: var(--rex-geo-primary);
+    border-color: var(--rex-geo-primary);
+    color: #fff;
 }
 
 .btn.search:hover,
 .btn.set:hover {
-    background-color: var(--bs-primary-emphasis);
-    border-color: var(--bs-primary-emphasis);
-}
-
-@media (prefers-color-scheme: dark) {
-    .rex-geo-search-modal {
-        background-color: rgba(0,0,0,0.7);
-    }
+    background-color: var(--rex-geo-primary-hover);
+    border-color: var(--rex-geo-primary-hover);
 }
