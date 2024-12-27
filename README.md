@@ -137,6 +137,30 @@ Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 - Höhere Limits möglich
 - Bessere Treffergenauigkeit
 
+## Geopicker für Module / AddOns Beispiel 
+
+In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss die Class `rex-coords` besitzen. 
+
+```
+<div class="form-group">
+    <label>Location 1</label>
+    <input type="text" 
+           name="REX_INPUT_VALUE[1]" 
+           value="REX_VALUE[1]" 
+           class="form-control rex-coords"
+           readonly>
+</div>
+
+<div class="form-group">
+    <label>Location 2</label>
+    <input type="text" 
+           name="REX_INPUT_VALUE[2]" 
+           value="REX_VALUE[2]" 
+           class="form-control rex-coords"
+           readonly>
+</div>
+```
+
 ## Changelog
 
 ### Version 1.4.0 // 27.12.2024
@@ -161,7 +185,7 @@ Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 
 * Massencodierung über Geoapify hinzugefügt (dtpop)
 
-[...vorherige Versionen...]
+
 
 ## Credits
 
