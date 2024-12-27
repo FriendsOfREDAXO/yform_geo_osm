@@ -1,29 +1,43 @@
 :root {
-    --rex-geo-background: #fff;
-    --rex-geo-background-hover: #f8f9fa;
-    --rex-geo-text: #212529;
-    --rex-geo-border: #dee2e6;
-    --rex-geo-input-bg: #fff;
-    --rex-geo-input-text: #212529;
-    --rex-geo-input-border: #dee2e6;
-    --rex-geo-shadow: rgba(0,0,0,0.1);
-    --rex-geo-primary: #2196F3;
-    --rex-geo-primary-hover: #1e87db;
-    --rex-geo-success: #4CAF50;
-    --rex-geo-success-hover: #45a049;
+   --rex-geo-background: #fff;
+   --rex-geo-background-hover: #f8f9fa;
+   --rex-geo-text: #212529;
+   --rex-geo-border: #dee2e6;
+   --rex-geo-input-bg: #fff;
+   --rex-geo-input-text: #212529;
+   --rex-geo-input-border: #dee2e6;
+   --rex-geo-shadow: rgba(0,0,0,0.1);
+   --rex-geo-primary: #2196F3;
+   --rex-geo-primary-hover: #1e87db;
+   --rex-geo-success: #4CAF50;
+   --rex-geo-success-hover: #45a049;
 }
 
-body.rex-theme-dark {
-    --rex-geo-background: #32373c;
-    --rex-geo-background-hover: #3c4146;
-    --rex-geo-text: #fff;
-    --rex-geo-border: #404448;
-    --rex-geo-input-bg: #282c30;
-    --rex-geo-input-text: #fff;
-    --rex-geo-input-border: #404448;
-    --rex-geo-shadow: rgba(0,0,0,0.3);
+/* Dark theme colors */
+:root[data-theme="dark"], 
+.rex-has-theme.rex-theme-dark {
+   --rex-geo-background: #32373c;
+   --rex-geo-background-hover: #3c4146;
+   --rex-geo-text: #fff;
+   --rex-geo-border: #404448;
+   --rex-geo-input-bg: #282c30;
+   --rex-geo-input-text: #fff;
+   --rex-geo-input-border: #404448;
+   --rex-geo-shadow: rgba(0,0,0,0.3);
 }
 
+@media (prefers-color-scheme: dark) {
+   :root {
+       --rex-geo-background: #32373c;
+       --rex-geo-background-hover: #3c4146;
+       --rex-geo-text: #fff;
+       --rex-geo-border: #404448;
+       --rex-geo-input-bg: #282c30;
+       --rex-geo-input-text: #fff;
+       --rex-geo-input-border: #404448;
+       --rex-geo-shadow: rgba(0,0,0,0.3);
+   }
+}
 .rex-geo-search-modal {
     display: none;
     position: fixed;
