@@ -35,13 +35,16 @@ rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addDynJs', rex_extensio
 
     <br>
     <div class="btn-group">
-        <button class="btn set" id="set-geo-<?=$this->getId()?>" type="button">
+        <button class="btn btn-primary set" id="set-geo-<?=$this->getId()?>" type="button">
+            <i class="fa-solid fa-map-marker-alt"></i> 
             <?= rex_i18n::msg('yform_geo_osm_get_coords') ?>
         </button>
-        <button class="btn search" id="search-geo-<?=$this->getId()?>" type="button">
+        <button class="btn btn-primary search" id="search-geo-<?=$this->getId()?>" type="button">
+            <i class="fa-solid fa-magnifying-glass"></i> 
             <?= rex_i18n::msg('yform_geo_osm_search_address') ?>
         </button>
-        <button class="btn browser-location" id="browser-geo-<?=$this->getId()?>" type="button">
+        <button class="btn btn-primary browser-location" id="browser-geo-<?=$this->getId()?>" type="button">
+            <i class="fa-solid fa-location-crosshairs"></i> 
             <?= rex_i18n::msg('yform_geo_osm_get_location') ?>
         </button>
     </div>
