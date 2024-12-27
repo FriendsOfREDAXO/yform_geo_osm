@@ -71,21 +71,10 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         $(this).closest('.rex-geo-search-modal').hide();
     });
 
-    // Search functionality
-    $('#rex-geo-search-button-'+id).on('click', function(e) {
+    // Live search
+    $('#rex-geo-search-input-'+id).on('input', function(e) {
         e.preventDefault();
-        e.stopPropagation();
-        performSearch($('#rex-geo-search-input-'+id).val());
-        return false;
-    });
-
-    $('#rex-geo-search-input-'+id).on('keypress', function(e) {
-        if(e.which == 13) {
-            e.preventDefault();
-            e.stopPropagation();
-            performSearch($(this).val());
-            return false;
-        }
+        performSearch($(this).val());
     });
 
     let searchTimeout;
