@@ -54,7 +54,7 @@ rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addDynJs', rex_extensio
             <span class="rex-geo-search-close">&times;</span>
             <input type="text" id="rex-geo-search-input-<?=$this->getId()?>" 
                    placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>">
-            <button id="rex-geo-search-button-<?=$this->getId()?>" class="btn btn-save">
+            <button type="button" id="rex-geo-search-button-<?=$this->getId()?>" class="btn btn-save">
                 <?= rex_i18n::msg('yform_geo_osm_search') ?>
             </button>
         </div>
