@@ -149,3 +149,129 @@
     background-color: var(--rex-geo-primary-hover);
     border-color: var(--rex-geo-primary-hover);
 }
+
+
+.rex-coord-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.rex-coord-content {
+    background-color: #fff;
+    margin: 5% auto;
+    width: 90%;
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.rex-coord-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rex-coord-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.rex-coord-close {
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.rex-coord-close:hover {
+    opacity: 1;
+}
+
+.rex-coord-search {
+    padding: 15px 20px;
+    position: relative;
+}
+
+#rex-coord-search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#rex-coord-search-results {
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    right: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.search-result {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.search-result:hover {
+    background-color: #f5f5f5;
+}
+
+#rex-coord-map {
+    height: 400px;
+    width: 100%;
+}
+
+.rex-coord-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.rex-coord-footer button {
+    margin-left: 10px;
+}
+
+/* Dark theme support */
+body.rex-has-theme.rex-theme-dark .rex-coord-content {
+    background-color: #32373c;
+    color: #fff;
+}
+
+body.rex-has-theme.rex-theme-dark .rex-coord-header,
+body.rex-has-theme.rex-theme-dark .rex-coord-footer {
+    border-color: #404448;
+}
+
+body.rex-has-theme.rex-theme-dark #rex-coord-search-input {
+    background-color: #282c30;
+    border-color: #404448;
+    color: #fff;
+}
+
+body.rex-has-theme.rex-theme-dark #rex-coord-search-results {
+    background-color: #32373c;
+    border-color: #404448;
+}
+
+body.rex-has-theme.rex-theme-dark .search-result {
+    border-color: #404448;
+}
+
+body.rex-has-theme.rex-theme-dark .search-result:hover {
+    background-color: #3c4146;
+}
