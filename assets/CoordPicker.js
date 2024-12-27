@@ -134,3 +134,8 @@ class CoordPicker {
         this.searchInput.value = '';
     }
 }
+$(document).on('rex:ready', function() {
+    new CoordPicker({
+        mapboxToken: '' // Optional Mapbox token
+    });
+});
