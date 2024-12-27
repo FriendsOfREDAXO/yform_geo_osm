@@ -55,9 +55,13 @@ rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addDynJs', rex_extensio
     <div class="rex-geo-search-modal" id="rex-geo-search-modal-<?=$this->getId()?>">
         <div class="rex-geo-search-content">
             <span class="rex-geo-search-close">&times;</span>
-            <input type="text" id="rex-geo-search-input-<?=$this->getId()?>" 
-                   placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>"
-                   autocomplete="off">
+            <div class="rex-geo-search-wrapper">
+                <input type="text" 
+                       id="rex-geo-search-input-<?=$this->getId()?>" 
+                       class="rex-geo-search-input form-control input-lg"
+                       placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>"
+                       autocomplete="off">
+            </div>
             <div id="rex-geo-search-results-<?=$this->getId()?>" class="search-results"></div>
         </div>
     </div>
