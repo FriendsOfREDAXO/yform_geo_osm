@@ -34,6 +34,9 @@
 Die geo_search Klasse bietet verschiedene Möglichkeiten der Geocodierung:
 
 #### 1. Einzelne Adressabfrage
+
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+
 ```php
 // Geocoder initialisieren
 $geocoder = geo_search::forGeocoding('optional-api-key');
@@ -50,6 +53,9 @@ if ($coords) {
 ```
 
 #### 2. Massengeokodierung
+
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+
 ```php
 // Geocoder für Massenverarbeitung initialisieren
 $geocoder = geo_search::forBulkGeocoding(
@@ -72,6 +78,9 @@ printf(
 ```
 
 #### 3. PLZ-Umkreissuche
+
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+
 ```php
 // Geocoder für PLZ-Suche initialisieren
 $geo = new geo_search(
