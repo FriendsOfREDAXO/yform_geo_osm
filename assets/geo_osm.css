@@ -1,0 +1,54 @@
+.rex-geo-search-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.rex-geo-search-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 4px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.rex-geo-search-close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#rex-geo-search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn-group {
+    margin-bottom: 10px;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.btn.browser-location {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn.search {
+    background-color: #2196F3;
+    color: white;
+}
