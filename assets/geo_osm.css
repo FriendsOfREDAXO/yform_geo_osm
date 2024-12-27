@@ -10,7 +10,7 @@
 }
 
 .rex-geo-search-content {
-    background-color: #fff;
+    background-color: var(--bs-body-bg, #fff);
     margin: 10% auto;
     padding: 30px;
     border-radius: 8px;
@@ -18,6 +18,7 @@
     max-width: 800px;
     position: relative;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    color: var(--bs-body-color);
 }
 
 .rex-geo-search-close {
@@ -26,19 +27,11 @@
     top: 10px;
     font-size: 28px;
     cursor: pointer;
-    color: #666;
+    opacity: 0.7;
 }
 
 .rex-geo-search-close:hover {
-    color: #333;
-}
-
-.rex-geo-search-input {
-    width: 100%;
-    font-size: 24px;
-    padding: 15px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+    opacity: 1;
 }
 
 .rex-geo-search-wrapper {
@@ -46,27 +39,40 @@
     width: 90%;
 }
 
-#rex-geo-search-input:focus {
-    border-color: #2196F3;
+.rex-geo-search-input {
+    width: 100%;
+    font-size: 24px !important;
+    padding: 15px !important;
+    border: 2px solid var(--bs-border-color, #ddd) !important;
+    border-radius: 8px !important;
+    height: auto !important;
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+.rex-geo-search-input:focus {
+    border-color: #2196F3 !important;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(33,150,243,0.1);
+    box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
 }
 
 .search-results {
     max-height: 400px;
     overflow-y: auto;
-    margin-top: 15px;
+    margin: 15px auto;
+    width: 90%;
 }
 
 .search-result {
     padding: 12px 15px;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--bs-border-color, #eee);
     transition: background-color 0.2s ease;
+    font-size: 16px;
 }
 
 .search-result:hover {
-    background-color: #f5f5f5;
+    background-color: var(--bs-tertiary-bg);
 }
 
 .btn-group {
@@ -79,10 +85,28 @@
 
 .btn.browser-location {
     background-color: #4CAF50;
-    color: white;
+    border-color: #4CAF50;
 }
 
-.btn.search, .btn.set {
+.btn.browser-location:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+}
+
+.btn.search, 
+.btn.set {
     background-color: #2196F3;
-    color: white;
+    border-color: #2196F3;
+}
+
+.btn.search:hover,
+.btn.set:hover {
+    background-color: #1e87db;
+    border-color: #1e87db;
+}
+
+@media (prefers-color-scheme: dark) {
+    .rex-geo-search-modal {
+        background-color: rgba(0,0,0,0.7);
+    }
 }
