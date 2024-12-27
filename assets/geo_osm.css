@@ -118,14 +118,6 @@
     background-color: var(--rex-geo-background-hover);
 }
 
-.btn-group {
-    margin-bottom: 10px;
-}
-
-.btn-group .btn {
-    margin-right: 5px;
-}
-
 .btn.browser-location {
     background-color: var(--rex-geo-success);
     border-color: var(--rex-geo-success);
