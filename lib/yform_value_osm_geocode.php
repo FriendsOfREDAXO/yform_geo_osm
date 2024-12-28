@@ -34,7 +34,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'mapbox_token' => array ( 'type' => 'text', 'label' => 'Mapbox Token (optional)')
             ),
             'description' => 'Openstreetmap Positionierung',
-            'dbtype' => 'text',
+            'dbtype' => 'varchar(191)',
             'formbuilder' => false,
             'multi_edit' => false,
         );
