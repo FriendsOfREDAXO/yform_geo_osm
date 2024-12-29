@@ -57,7 +57,7 @@ if ($coords) {
 > Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
 
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist dies Funktion derzeit nicht möglich. 
+> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich. 
 
 ```php
 // Geocoder für Massenverarbeitung initialisieren
@@ -85,7 +85,7 @@ printf(
 > Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
 
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist dies Funktion derzeit nicht möglich. 
+> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich. 
 
 ```php
 // Geocoder für PLZ-Suche initialisieren
