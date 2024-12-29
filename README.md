@@ -1,6 +1,6 @@
 # YForm Erweiterung: Geo (OSM)
 
-![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/yform_geo_osm/master/assets/preview.png)
+![Screenshot](https://github.com/FriendsOfREDAXO/yform_geo_osm/blob/assets/screen.png?raw=true)
 
 * YForm Erweiterung für die Einbindung einer Geocoding-Funktion basierend auf Openstreetmaps
 * Anpassung der Geo-Daten über Map-Marker möglich
