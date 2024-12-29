@@ -72,7 +72,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 
     public function getDescription(): string
     {
-        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|';
+        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[mapbox_token]|[no_db]';
     }
 
     public function getDefinitions(): array
@@ -87,6 +87,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'address' => ['type' => 'text', 'label' => 'Feldnamen Positionsfindung (Bsp. strasse,plz,ort)'],
                 'height' => ['type' => 'text', 'label' => 'Map-H&ouml;he'],
                 'mapbox_token' => ['type' => 'text', 'label' => 'Mapbox Token (optional)'],
+                'no_db' => ['type' => 'no_db',   'label' => rex_i18n::msg('yform_values_defaults_table'),  'default' => 0],
             ],
             'description' => 'Openstreetmap Positionierung',
             'dbtype' => 'varchar(191)',
