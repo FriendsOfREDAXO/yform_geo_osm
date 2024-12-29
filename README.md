@@ -54,7 +54,10 @@ if ($coords) {
 
 #### 2. Massengeokodierung
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
+
+> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
+> möglichen [kombinierten Feld](#yform) ist dies Funktion derzeit nicht möglich. 
 
 ```php
 // Geocoder für Massenverarbeitung initialisieren
@@ -81,6 +84,9 @@ printf(
 
 > Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
 
+> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
+> möglichen [kombinierten Feld](#yform) ist dies Funktion derzeit nicht möglich. 
+
 ```php
 // Geocoder für PLZ-Suche initialisieren
 $geo = new geo_search(
@@ -101,11 +107,12 @@ $geo = new geo_search(
 $results = $geo->searchByPostalcode('12345', 50);
 ```
 
+<a name="yform"></a>
 ### YForm Integration
 
 #### Beispielmodul für YForm Frontend
 ```php
-rex_extension::register('OUTPUT_FILTER', 'yform_geo_osm::addAssets');
+rex_extension::register('OUTPUT_FILTER', yform_geo_osm::addAssets(...));
 
 $yform = new rex_yform();
 $yform->setObjectparams('form_name', 'table-rex_geotest');
@@ -114,14 +121,34 @@ $yform->setObjectparams('form_ytemplate', 'bootstrap');
 $yform->setObjectparams('form_showformafterupdate', 0);
 $yform->setObjectparams('real_field_names', true);
 
-$yform->setValueField('text', array('street','Straße','','0'));
-$yform->setValueField('text', array('postalcode','PLZ','','0'));
-$yform->setValueField('text', array('city','Ort','','0'));
-$yform->setValueField('number', array('lat','LAT','10','8','','0'));
-$yform->setValueField('number', array('lng','LNG','11','8','','0'));
-$yform->setValueField('osm_geocode', array('osm','OSM','lat,lng','street,postalcode,city','500'));
+$yform->setValueField('text', ['street','Straße','','0']);
+$yform->setValueField('text', ['postalcode','PLZ','','0']);
+$yform->setValueField('text', ['city','Ort','','0']);
+$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
+$yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','0']);
 
 echo $yform->getForm();
+```
+
+Die Koordinaten können entweder in den Einzelfeldern (`lat`, `lng`) oder im osm_geocode-Feld (`osm`) gespeichert
+werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank speichern" festgelegt. Da im osm_geocode-Feld
+per Default keine Daten abgelegt werden, sondern in den Einzelfeldern, sollte wie im Beispiel 1 gezeigt das Feld gar nicht erst in der Datenbank angelegt werden.
+
+*Beispiel 1: Koordinaten als Einzelwerte  `lat` bzw. `lng` speichern*
+
+```php
+$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
+$yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','1']);
+```
+
+*Beispiel 2: Koordinaten als Kombiwert (`lat,lng`) in `osm` speichern*
+
+```php
+$yform->setValueField('number', ['lat','LAT','10','7','','1','input:text']);
+$yform->setValueField('number', ['lng','LNG','11','8','','1','input:text']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','0']);
 ```
 
 ### Massengeokodierung in YForm
