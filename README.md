@@ -2,7 +2,7 @@
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/yform_geo_osm/blob/assets/screen.png?raw=true)
 
-* YForm-Erweiterung, um eine  Geocoding-Funktion einzubinden. Basierend auf OpenStreetMap
+* YForm-Erweiterung, um eine Geocoding-Funktion einzubinden. Basierend auf OpenStreetMap
 * Anpassung der Geodaten über Map-Marker möglich
 * Live-Suche für Adressen mit Vorschlägen
 * Browser-Standortbestimmung
@@ -15,7 +15,7 @@
 ## Installation
 
 * Paket herunterladen oder über den Installer installieren
-* Optional: Mapbox-Token für zusätzliche Kartenebenen  (Layer)
+* Optional: Mapbox-Token für zusätzliche Kartenebenen (Layer)
 * Optional: Geoapify API-Key für erweiterte Geocoding-Funktionen
 
 ## Features
@@ -242,8 +242,6 @@ MIT-Lizenz, siehe [LICENSE](LICENSE)
 [NGWNGW](https://github.com/NGWNGW)
 
 **Weitere Credits**
-
-## Credits
 
 * Polarpixel – Peter Bickel (Testing / Ideen)
 * Wolfgang Bund – Massencodierung
