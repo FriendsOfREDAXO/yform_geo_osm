@@ -1,7 +1,5 @@
 <?php
 
-use FriendsOfRedaxo\YFormGeoOsm\rex_yform_value_osm_geocode;
-
 /**
  * @var array<string> $addressfields
  * @var array<string> $geofields
