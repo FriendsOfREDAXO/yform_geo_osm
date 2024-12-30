@@ -2,40 +2,40 @@
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/yform_geo_osm/blob/assets/screen.png?raw=true)
 
-* YForm Erweiterung für die Einbindung einer Geocoding-Funktion basierend auf Openstreetmaps
-* Anpassung der Geo-Daten über Map-Marker möglich
+* YForm-Erweiterung, um eine  Geocoding-Funktion einzubinden. Basierend auf OpenStreetMap
+* Anpassung der Geodaten über Map-Marker möglich
 * Live-Suche für Adressen mit Vorschlägen
-* Browser-Standortbestimmung möglich
-* Openstreetmaps (Karte), optional Mapbox (Karte + Satellit)
-* PHP Klasse "geo_search" für:
+* Browser-Standortbestimmung
+* OpenStreetMap (Straßenkarte), optional Mapbox (Straßenkarte + Satellitenbilder)
+* PHP-Klasse `Search` für:
   * Einzelne Adressabfragen
-  * Postleitzahlbasierte Umkreissuche
-  * Massengeokodierung von Adressen auch außerhalb von YForm
+  * Umkreissuche basierend auf Postleitzahlen
+  * Batch-Geocodierung von Adressen auch außerhalb von YForm
 
 ## Installation
 
 * Paket herunterladen oder über den Installer installieren
-* Optional: Mapbox Token für zusätzliche Kartenlayer
-* Optional: Geoapify API Key für erweiterte Geocoding-Funktionen
+* Optional: Mapbox-Token für zusätzliche Kartenebenen  (Layer)
+* Optional: Geoapify API-Key für erweiterte Geocoding-Funktionen
 
 ## Features
 
-### YForm Geo Field
+### YForm-Feld `osm_geocode`
 
 * Interaktive Kartenansicht mit Marker
 * Live-Adresssuche mit Vorschlägen
 * Direkte Übernahme des Browser-Standorts
 * Automatische Koordinaten-Ermittlung aus Adressfeldern
-* Dark Mode Support
-* Responsive Design
+* Dark-Mode unterstützt
+* Responsive-Design
 
-### Geocoding-Funktionen
+### Geocodierungs-Funktionen
 
 Die `Search`-Klasse bietet verschiedene Möglichkeiten der Geocodierung:
 
-#### 1. Einzelne Adressabfrage
+> Hinweis: wenn man anstelle des API-Keys `config` schreibt, wird der API-Key der `config` übernommen.
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
+#### 1. Abfrage einer einzelnen Adresse
 
 ```php
 
@@ -55,12 +55,9 @@ if ($coords) {
 }
 ```
 
-#### 2. Massengeokodierung
+#### 2. Batch-Geokodierung
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
-
-> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich.
+> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
 
 ```php
 // Geocoder für Massenverarbeitung initialisieren
@@ -85,10 +82,7 @@ printf(
 
 #### 3. PLZ-Umkreissuche
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
-
-> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich.
+> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
 
 ```php
 // Geocoder für PLZ-Suche initialisieren
@@ -109,8 +103,6 @@ $geo = new Search(
 // Suche nach Adressen im Umkreis von 50km um PLZ 12345
 $results = $geo->searchByPostalcode('12345', 50);
 ```
-
-<a name="yform"></a>
 
 ### YForm Integration
 
@@ -136,11 +128,10 @@ $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,c
 echo $yform->getForm();
 ```
 
-Die Koordinaten können entweder in den Einzelfeldern (`lat`, `lng`) oder im osm_geocode-Feld (`osm`) gespeichert
-werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank speichern" festgelegt. Da im osm_geocode-Feld
-per Default keine Daten abgelegt werden, sondern in den Einzelfeldern, sollte wie im Beispiel 1 gezeigt das Feld gar nicht erst in der Datenbank angelegt werden.
+Die Koordinaten können entweder in den Einzelfeldern (`lat`, `lng`) oder im `osm_geocode`-Feld (`osm`) gespeichert
+werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank speichern" festgelegt. Da im `osm_geocode`-Feld per Default keine Daten abgelegt werden, sondern in den Einzelfeldern, sollte wie im Beispiel 1 gezeigt das Feld gar nicht erst in der Datenbank angelegt werden.
 
-*Beispiel 1: Koordinaten als Einzelwerte  `lat` bzw. `lng` speichern*
+*Beispiel 1: Koordinaten als Einzelwerte `lat` bzw. `lng` speichern*
 
 ```php
 $yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
@@ -156,34 +147,34 @@ $yform->setValueField('number', ['lng','LNG','11','8','','1','input:text']);
 $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','0']);
 ```
 
-### Massengeokodierung in YForm
+### Batch-Geokodierung in YForm
 
-Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
+Die Batch-Geokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 
 1. Tabelle mit Geocode-Feld auswählen
-2. Optional: Geoapify API Key eintragen
+2. Optional: Geoapify-API-Key eintragen
 3. Geocodierung starten
-4. Verarbeitung erfolgt in 200er Batches
+4. Verarbeitung erfolgt in 200er-Schritten
 
 ## API-Nutzung
 
-### Nominatim
+### Dienst: Nominatim
 
 *-* Standardmäßig wird Nominatim verwendet
 
 * Kostenlos, aber mit Nutzungsbeschränkungen
-* Rate Limiting beachten
+* Rate Limit beachten
 
-### Geoapify
+### Dienst: Geoapify
 
 * Optional für erweiterte Funktionen
 * API-Key erforderlich
 * Höhere Limits möglich
-* Bessere Treffergenauigkeit
+* Bessere Genauigkeit
 
-## Geopicker für Module / AddOns Beispiel
+## Geopicker für Module / Add-ons Beispiel
 
-In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss die Class `rex-coords` besitzen.
+In diesem Fall werden die Koordinaten in einem Feld gespeichert. Das Feld muss die CSS-Klasse `rex-coords` besitzen.
 
 ```html
 <div class="form-group">
@@ -209,17 +200,18 @@ In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss di
 
 ### Version 2.0.0 //
 
-* Umstellung auf FriendsOfREDAXO-Namespace
-* Sprachdateien aktualisiert
+* Umstellung auf FriendsOfREDAXO-Namespace. @alxndr-w
+* Sprachdateien aktualisiert.
+* Von rexstan gemeldete Code-Verbesserungen umgesetzt.
 
 ### Version 1.4.0 // 27.12.2024
 
 * Neue Funktionen für einzelne Adressabfragen
-* Verbesserte geo_search Klasse mit drei Betriebsmodi:
+* Verbesserte `geo_search`-Klasse mit drei Betriebsmodi:
   * Einzelabfrage
-  * Massengeokodierung
+  * Batch-Geokodierung
   * PLZ-Umkreissuche
-* Erweiterte Dokumentation und Beispiele
+* Erweiterte Dokumentation und Beispiele.
 
 ### Version 1.3.0 // 27.12.2024
 
@@ -232,19 +224,30 @@ In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss di
 
 ### Version 1.2.3 // 17.08.2020
 
-* Massencodierung über Geoapify hinzugefügt (dtpop)
+* Massencodierung über Geoapify hinzugefügt (@dtpop)
+
+## Lizenz
+
+MIT-Lizenz, siehe [LICENSE](LICENSE)
+
+## Autoren
+
+**Friends Of REDAXO**
+
+* <http://www.redaxo.org>
+* <https://github.com/FriendsOfREDAXO>
+
+**Project Lead**
+
+[NGWNGW](https://github.com/NGWNGW)
+
+**Weitere Credits**
 
 ## Credits
 
-* Polarpixel - Peter Bickel (Testing / Ideen)
-* Wolfgang Bund - Massencodierung
+* Polarpixel – Peter Bickel (Testing / Ideen)
+* Wolfgang Bund – Massencodierung
 * Leaflet
-* Openstreetmaps
+* OpenStreetMap
 * Mapbox
 * Geoapify
-
-## Support & Lizenz
-
-* MIT Lizenz
-* Support über GitHub Issues
-* Beiträge willkommen
