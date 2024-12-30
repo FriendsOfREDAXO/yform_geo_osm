@@ -3,28 +3,30 @@
  * Aus Codeschnippseln verschiedener Addons
  */
 
+namespace FriendsOfREDAXO\YFormGeoOSM;
 
-namespace yform\geoosm;
+/** @var \rex_addon $this */
 
 echo \rex_view::title('YForm GeoOSM');
 
-$table_name = rex_request('osm-geo-table', 'string','');
+$table_name = rex_request('osm-geo-table', 'string', '');
 
 $geosql = \rex_sql::factory();
 $table = null;
 $addon = \rex_addon::get('yform_geo_osm');
 
-if (rex_request('config-submit','int',0) == 1) {
-    $addon->setConfig('geoapifykey',rex_request('geoapifykey','string'));
+if (rex_request('config-submit', 'int', 0) === 1) {
+    $addon->setConfig('geoapifykey', rex_request('geoapifykey', 'string'));
 }
 
 $tables = \rex_yform_manager_table::getAll();
 $geo_tables = [];
+$fields = [];
 foreach ($tables as $i_table) {
     $fields = $i_table->getValueFields(['type_name' => 'osm_geocode']);
     if (count($fields) > 0) {
         $geo_tables[$i_table->getTableName()] = $i_table;
-        if ($table_name == $i_table->getTableName()) {
+        if ($table_name === $i_table->getTableName()) {
             $table = $i_table;
             break;
         }
@@ -37,7 +39,7 @@ $sel_table->setId('osm-geo-table');
 $sel_table->setName('osm-geo-table');
 $sel_table->setSize(1);
 $sel_table->setAttribute('class', 'form-control');
-$sel_table->setSelected(rex_request('osm-geo-table','string',''));
+$sel_table->setSelected(rex_request('osm-geo-table', 'string', ''));
 
 foreach ($geo_tables as $gt=>$gtable) {
     $sel_table->addOption($gt, $gt);
@@ -102,9 +104,9 @@ if ($table) {
     $field = rex_request('geo_field', 'string');
     
     $geo_sql = \rex_sql::factory();
-//    $geo_sql->setDebug();
+    //    $geo_sql->setDebug();
     
-    if ($func == 'get_data') {
+    if ($func === 'get_data') {
         $data = [];
         ob_end_clean();
         if (array_key_exists($field, $fields)) {
@@ -117,7 +119,7 @@ if ($table) {
 
             $pos_fields = explode(',', $fields[$field]['latlng']); // das Element position gibt es nicht
             $pos_field = $fields[$field]['name'];
-            if (count($pos_fields) == 2) {
+            if (count($pos_fields) === 2) {
                 $pos_lat = $pos_fields[0];
                 $pos_lng = $pos_fields[1];
                 $geo_sql->setQuery('select id, ' . $concat . ' from ' . $table['table_name'] . ' where ' . $pos_lng . '="" or ' . $pos_lng . ' IS NULL or ' . $pos_lat . '="" or ' . $pos_lat . ' IS NULL LIMIT 3000');
@@ -132,7 +134,7 @@ if ($table) {
         exit;
     }
     
-    if ($func == 'save_data') {
+    if ($func === 'save_data') {
         ob_end_clean();
         $data = '0';
         if (array_key_exists($field, $fields)) {
@@ -141,12 +143,12 @@ if ($table) {
             $data_id = rex_request('geo_id', 'int', 0);
             $pos_fields = explode(',', $fields[$field]['latlng']);
             $pos_field = $fields[$field]['name'];
-            if (count($pos_fields) == 2) {
+            if (count($pos_fields) === 2) {
                 $pos_lat = $pos_fields[0];
                 $pos_lng = $pos_fields[1];
                 $gd = \rex_sql::factory();
                 $gd->setQuery('select id, ' . $gd->escapeIdentifier($pos_lat) . ', ' . $gd->escapeIdentifier($pos_lng) . ' from ' . $table['table_name'] . ' where id = ' . $gd->escape($data_id) . '');
-                if ($gd->getRows() == 1 && $data_lng != '' && $data_lat != '') {
+                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
                     $sd->setWhere('id=' . $data_id);
@@ -157,8 +159,8 @@ if ($table) {
                 }
             } elseif ($pos_field) {
                 $gd = \rex_sql::factory();
-                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . $gd->escape($data_id));
-                if ($gd->getRows() == 1 && $data_lng != '' && $data_lat != '') {
+                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . (string) $gd->escape($data_id));
+                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
                     $geopos = $data_lat.','.$data_lng;
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
@@ -166,12 +168,12 @@ if ($table) {
                     $sd->setValue($pos_field, $geopos);
                     $sd->update();
                     $data = '1';
-                }                
-            } 
+                }
+            }
         }
         echo $data;
         exit;
-    }    
+    }
     
     foreach ($fields as $k => $v) {
         $content .= '<p><a class="btn btn-setup" href="javascript:osm_geo_updates(\'' . $table['table_name'] . '\',\'' . $k . '\')">Google Geotagging starten</a> &nbsp;Hiermit werden alle Datensätze anhand des Felder "' . $k . '" nach fehlenden Geopositionen durchsucht und neu gesetzt.</p>'
@@ -181,128 +183,136 @@ if ($table) {
     $content .= '</fieldset>';
     
     echo $content;
-   
+
 }
 
 ?>
 
 <script type="text/javascript">
-    
-    var data_counter = 0;
-    var data_running = 0;
-    var data_next = -1;
-    var data = "";
-    var table = "";
-    var field = "";
-    var data_id = 0;
-    var latitude = 0;
-    var longitude = 0;
-    var locked = 0;
-    
-    function osm_geo_updates(tablename,fieldname) {
-        if(data_running == 1) return false;
-        data_running = 1;
-        field = fieldname;
-        table = tablename;
-        var currentTime = new Date();
-        link = "index.php?page=yform/yform_geo_osm/&osm-geo-table="+tablename+"&geo_func=get_data&geo_field="+fieldname+"&nocache="+currentTime.getTime();
-        jQuery.ajax({
-            url: link,
-            dataType: "json",
-            success: function(datam){
-                data = datam;
-//                console.log(datam);
-                data_counter = 0;
-                osm_geo_update();
-            },
-            error: function() {
-                alert("error loading "+link);
-            }
-        });
-    }
-    
-    function osm_geo_update() {
-        if(data.length == data_counter) {
-            data_running = 0;
-            return false;
-        }
-        
-//        var address = encodeURIComponent(data[data_counter]["address"]);
-        var address = data[data_counter]["address"];
-        data_id = data[data_counter]["id"];
-        
-//        get_geocode_link = 'https://nominatim.openstreetmap.org/search?q='+address+"&format=json&polygon=0&addressdetails=0";
-//        get_geocode_link = 'https://api.nettoolkit.com/v1/geo/geocodes?address='+address+'&key=test_RXNtAxEJzQHkLiorg1wEmVyzirqlsxQYS4gDncPl';
+	var data_counter = 0;
+	var data_running = 0;
+	var data_next = -1;
+	var data = "";
+	var table = "";
+	var field = "";
+	var data_id = 0;
+	var latitude = 0;
+	var longitude = 0;
+	var locked = 0;
 
-        get_geocode_link = 'https://api.geoapify.com/v1/geocode/search?text='+address+'&limit=1&apiKey=<?= $addon->getConfig('geoapifykey') ?>';
-        locked = 1;
+	function osm_geo_updates(tablename, fieldname) {
+		if (data_running === 1) return false;
+		data_running = 1;
+		field = fieldname;
+		table = tablename;
+		var currentTime = new Date();
+		link = "index.php?page=yform/yform_geo_osm/&osm-geo-table=" + tablename + "&geo_func=get_data&geo_field=" +
+			fieldname + "&nocache=" + currentTime.getTime();
+		jQuery.ajax({
+			url: link,
+			dataType: "json",
+			success: function(datam) {
+				data = datam;
+				//                console.log(datam);
+				data_counter = 0;
+				osm_geo_update();
+			},
+			error: function() {
+				alert("error loading " + link);
+			}
+		});
+	}
 
-        jQuery.ajax({
-            dataType: "json",
-            url: get_geocode_link,
-            success: function(gdata) {
-                latitude = gdata.features[0].properties.lat;
-                longitude = gdata.features[0].properties.lon;
-                save_data();
-            },
-            error: function() {
-                jQuery("#osm_geo_count_"+field).prepend('<?= \rex_view::error('Anfrage blockiert oder Netzwerkfehler.') ?>');                
-            }
-        });
+	function osm_geo_update() {
+		if (data.length === data_counter) {
+			data_running = 0;
+			return false;
+		}
 
-        data_counter = data_counter + 1;
+		//        var address = encodeURIComponent(data[data_counter]["address"]);
+		var address = data[data_counter]["address"];
+		data_id = data[data_counter]["id"];
 
-        if(data_next == "0") {
-            jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+"<a href=\"index.php?page=yform/manager/data_edit&table_name="+table+"&data_id="+data_id+"&func=edit&start=\">Geocoding not possible, try manually [id=\""+data_id+"\"]</a>");
-            // return false;
-        }
-        
-        
-//        setTimeout("osm_geo_update()",1000);
-        waitForReady();
+		//        get_geocode_link = 'https://nominatim.openstreetmap.org/search?q='+address+"&format=json&polygon=0&addressdetails=0";
+		//        get_geocode_link = 'https://api.nettoolkit.com/v1/geo/geocodes?address='+address+'&key=test_RXNtAxEJzQHkLiorg1wEmVyzirqlsxQYS4gDncPl';
 
-    }
-    
-    
-    function waitForReady() {
-        if(locked == 0) {
-            osm_geo_update();
-        } else {
-            setTimeout('waitForReady()', 50);
-        }
-    }    
-    
-    
-    function save_data () {
-        
-        lat = latitude;
-        lon = longitude;
-        
-        outtext = '<?= \rex_view::success('===placeholder===') ?>';
-        
-        data_link = "index.php?page=yform/yform_geo_osm/&osm-geo-table="+table+"&geo_func=save_data&geo_field="+field+"&geo_lng="+lon+"&geo_lat="+lat+"&geo_id="+data_id;
-        
-        jQuery.ajax({
-            url: data_link,
-            success: function(data_status){
-                if(data_status == "1") {
-                    jQuery("#osm_geo_count_"+field).prepend(outtext.replace('===placeholder===','Id: '+data_id+' - '+data[data_counter]["address"]) );
-//                    jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+". ");
-                    data_next = "1";
-                    locked = false;
-                }else {
-                    jQuery("#osm_geo_count_"+field).prepend('<?= \rex_view::error('Konfigurationsfehler. Daten wurden nicht gespeichert.') ?>');                    
-                    // alert("data status" + data_status);
-                }
-            }
-        });
-    }
-    
-    
+		get_geocode_link = 'https://api.geoapify.com/v1/geocode/search?text=' + address +
+			'&limit=1&apiKey=<?= $addon->getConfig('geoapifykey') ?>';
+		locked = 1;
+
+		jQuery.ajax({
+			dataType: "json",
+			url: get_geocode_link,
+			success: function(gdata) {
+				latitude = gdata.features[0].properties.lat;
+				longitude = gdata.features[0].properties.lon;
+				save_data();
+			},
+			error: function() {
+				jQuery("#osm_geo_count_" + field).prepend(
+					'<?= \rex_view::error('Anfrage blockiert oder Netzwerkfehler.') ?>'
+				);
+			}
+		});
+
+		data_counter = data_counter + 1;
+
+		if (data_next === "0") {
+			jQuery("#osm_geo_count_" + field).html(jQuery("#osm_geo_count_" + field).html() +
+				"<a href=\"index.php?page=yform/manager/data_edit&table_name=" + table + "&data_id=" + data_id +
+				"&func=edit&start=\">Geocoding not possible, try manually [id=\"" + data_id + "\"]</a>");
+			// return false;
+		}
+
+
+		//        setTimeout("osm_geo_update()",1000);
+		waitForReady();
+
+	}
+
+
+	function waitForReady() {
+		if (locked === 0) {
+			osm_geo_update();
+		} else {
+			setTimeout('waitForReady()', 50);
+		}
+	}
+
+
+	function save_data() {
+
+		lat = latitude;
+		lon = longitude;
+
+		outtext =
+			'<?= \rex_view::success('===placeholder===') ?>';
+
+		data_link = "index.php?page=yform/yform_geo_osm/&osm-geo-table=" + table + "&geo_func=save_data&geo_field=" +
+			field + "&geo_lng=" + lon + "&geo_lat=" + lat + "&geo_id=" + data_id;
+
+		jQuery.ajax({
+			url: data_link,
+			success: function(data_status) {
+				if (data_status === "1") {
+					jQuery("#osm_geo_count_" + field).prepend(outtext.replace('===placeholder===', 'Id: ' +
+						data_id + ' - ' + data[data_counter]["address"]));
+					//                    jQuery("#osm_geo_count_"+field).html(jQuery("#osm_geo_count_"+field).html()+". ");
+					data_next = "1";
+					locked = false;
+				} else {
+					jQuery("#osm_geo_count_" + field).prepend(
+						'<?= \rex_view::error('Konfigurationsfehler. Daten wurden nicht gespeichert.') ?>'
+					);
+					// alert("data status" + data_status);
+				}
+			}
+		});
+	}
 </script>
 <style>
-    .status_output {
-        max-height: 50vh;
-        overflow-y: scroll;
-    }   
+	.status_output {
+		max-height: 50vh;
+		overflow-y: scroll;
+	}
 </style>

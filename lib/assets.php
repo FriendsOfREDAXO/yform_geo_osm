@@ -2,12 +2,17 @@
 
 namespace FriendsOfRedaxo\YFormGeoOsm;
 
+use rex_extension_point;
 use rex_url;
 
 class Assets
 {
 
-    public static function addAssets($ep)
+    /**
+     * @api
+     */
+
+    public static function addAssets(rex_extension_point $ep) : string
     {
 
         $assets_header = '
@@ -26,7 +31,11 @@ class Assets
 
     }
 
-    public static function addDynJs($ep)
+    /**
+     * @api
+     */
+
+    public static function addDynJs(rex_extension_point $ep) : string
     {
         $js = $ep->getParam('js');
         return str_replace('</body>', $js.'</body>', $ep->getSubject());
