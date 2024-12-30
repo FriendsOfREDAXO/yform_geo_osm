@@ -169,14 +169,15 @@ Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 
 ### Nominatim
 
-- Standardmäßig wird Nominatim verwendet
+*-* Standardmäßig wird Nominatim verwendet
+
 * Kostenlos, aber mit Nutzungsbeschränkungen
 * Rate Limiting beachten
 
 ### Geoapify
 
-- Optional für erweiterte Funktionen
-* API Key erforderlich
+* Optional für erweiterte Funktionen
+* API-Key erforderlich
 * Höhere Limits möglich
 * Bessere Treffergenauigkeit
 
@@ -184,7 +185,7 @@ Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 
 In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss die Class `rex-coords` besitzen.
 
-```
+```html
 <div class="form-group">
     <label>Location 1</label>
     <input type="text" 
@@ -205,6 +206,11 @@ In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss di
 ```
 
 ## Changelog
+
+### Version 2.0.0 //
+
+* Umstellung auf FriendsOfREDAXO-Namespace
+* Sprachdateien aktualisiert
 
 ### Version 1.4.0 // 27.12.2024
 
