@@ -2,20 +2,24 @@
 
 namespace FriendsOfRedaxo\YFormGeoOsm;
 
+use rex_functional_exception;
 use rex_i18n;
 use rex_yform_value_abstract;
-use rex_functional_exception;
+
+use function sprintf;
 
 class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 {
-    public ?rex_yform_value_abstract $latField = null;
-    public ?rex_yform_value_abstract $lngField = null;
-    public bool $combinedValue = false;
+    protected ?rex_yform_value_abstract $latField = null;
+    protected ?rex_yform_value_abstract $lngField = null;
+    protected bool $combinedValue = false;
 
     /**
      * Die Hilfsfelder im Formular für Lat/Lng identifizieren.
      * Falls es reine Hilfsfelder sind (nicht in der DB speichern)
      * werden ggf. sie aus diesem Feld initialisiert.
+     *
+     * @api
      */
     public function preValidateAction(): void
     {
@@ -54,7 +58,10 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         }
     }
 
-    public function enterObject()
+    /**
+     * @api
+     */
+    public function enterObject(): void
     {
         $addressfields = explode(',', str_replace(' ', '', $this->getElement('address')));
         $geofields = [$this->latField->getName(), $this->lngField->getName()];
@@ -76,11 +83,18 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         }
     }
 
+    /**
+     * @api
+     */
     public function getDescription(): string
     {
         return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[mapbox_token]|[no_db]';
     }
 
+    /**
+     * @api
+     * @return array<string, mixed>
+     */
     public function getDefinitions(): array
     {
         return [
