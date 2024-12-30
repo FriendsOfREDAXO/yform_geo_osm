@@ -9,7 +9,9 @@ requires:
     redaxo: '^5.17'
     php:
         version: '>=8.0, <9'
+
 page:
+    title: 'Geo OSM'
     hidden: true
 
 pages:
@@ -17,3 +19,6 @@ pages:
         title: 'Geo OSM'
         perm: admin[]
         icon: rex-icon fa-map-location-dot
+
+default_config:
+    geoapifykey: ''
