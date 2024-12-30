@@ -32,7 +32,7 @@ $js = '<script type="text/javascript">
     });
 </script>';
 
-rex_extension::register('OUTPUT_FILTER', 'FriendsOfRedaxo\YFormGeoOsm\Assets::addDynJs', rex_extension::LATE, ['js' => $js]);
+rex_extension::register('OUTPUT_FILTER', '\FriendsOfRedaxo\YFormGeoOsm\Assets::addDynJs', rex_extension::LATE, ['js' => $js]);
 ?>
 
 <div class="<?= $class_group ?>"
