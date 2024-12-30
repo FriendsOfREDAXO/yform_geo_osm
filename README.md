@@ -31,15 +31,18 @@
 
 ### Geocoding-Funktionen
 
-Die geo_search Klasse bietet verschiedene Möglichkeiten der Geocodierung:
+Die `Search`-Klasse bietet verschiedene Möglichkeiten der Geocodierung:
 
 #### 1. Einzelne Adressabfrage
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
 
 ```php
+
+namespace FriendsOfREDAXO\YFormGeoOSM;
+
 // Geocoder initialisieren
-$geocoder = geo_search::forGeocoding('optional-api-key');
+$geocoder = Search::forGeocoding('optional-api-key');
 
 // Variante 1: Mit einzelnen Feldern
 $coords = $geocoder->geocodeAddress('Musterstr. 1', 'Berlin', '10115');
@@ -57,11 +60,11 @@ if ($coords) {
 > Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
 
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich. 
+> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich.
 
 ```php
 // Geocoder für Massenverarbeitung initialisieren
-$geocoder = geo_search::forBulkGeocoding(
+$geocoder = Search::forBulkGeocoding(
     'rex_my_addresses',           // Tabellenname
     ['street', 'zip', 'city'],    // Adressfelder
     'latitude',                   // Feld für Breitengrad
@@ -82,14 +85,14 @@ printf(
 
 #### 3. PLZ-Umkreissuche
 
-> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen. 
+> Hinweis: wenn man anstelle des API-Keys config schreibt, wird der key der config übernommen.
 
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls
-> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich. 
+> möglichen [kombinierten Feld](#yform) ist diese Funktion derzeit nicht möglich.
 
 ```php
 // Geocoder für PLZ-Suche initialisieren
-$geo = new geo_search(
+$geo = new Search(
     [
         'table' => 'rex_plz_data',
         'lat_field' => 'lat',
@@ -108,11 +111,13 @@ $results = $geo->searchByPostalcode('12345', 50);
 ```
 
 <a name="yform"></a>
+
 ### YForm Integration
 
 #### Beispielmodul für YForm Frontend
+
 ```php
-rex_extension::register('OUTPUT_FILTER', yform_geo_osm::addAssets(...));
+rex_extension::register('OUTPUT_FILTER', FriendsOfRedaxo\YFormGeoOSM\Assets::addAssets(...));
 
 $yform = new rex_yform();
 $yform->setObjectparams('form_name', 'table-rex_geotest');
@@ -156,26 +161,28 @@ $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,c
 Die Massengeokodierung wird im YForm Reiter "Geo OSM" eingestellt:
 
 1. Tabelle mit Geocode-Feld auswählen
-2. Optional: Geoapify API Key eintragen 
+2. Optional: Geoapify API Key eintragen
 3. Geocodierung starten
 4. Verarbeitung erfolgt in 200er Batches
 
 ## API-Nutzung
 
 ### Nominatim
+
 - Standardmäßig wird Nominatim verwendet
-- Kostenlos, aber mit Nutzungsbeschränkungen
-- Rate Limiting beachten
+* Kostenlos, aber mit Nutzungsbeschränkungen
+* Rate Limiting beachten
 
 ### Geoapify
+
 - Optional für erweiterte Funktionen
-- API Key erforderlich
-- Höhere Limits möglich
-- Bessere Treffergenauigkeit
+* API Key erforderlich
+* Höhere Limits möglich
+* Bessere Treffergenauigkeit
 
-## Geopicker für Module / AddOns Beispiel 
+## Geopicker für Module / AddOns Beispiel
 
-In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss die Class `rex-coords` besitzen. 
+In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss die Class `rex-coords` besitzen.
 
 ```
 <div class="form-group">
@@ -217,11 +224,9 @@ In diesem Fall werden die Koodinaten in einem Feld gespeichert. Das Feld muss di
 * Dark Mode Support
 * Sprachdateien aktualisiert (DE/EN)
 
-### Version 1.2.3 // 17.08.2020 
+### Version 1.2.3 // 17.08.2020
 
 * Massencodierung über Geoapify hinzugefügt (dtpop)
-
-
 
 ## Credits
 
