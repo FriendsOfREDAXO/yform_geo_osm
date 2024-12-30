@@ -1,6 +1,13 @@
 <?php
 
-class geo_search {
+namespace FriendsOfRedaxo\YFormGeoOsm;
+
+use rex_sql;
+use rex_addon;
+use Exception;
+
+class Search
+{
 
     private $postalcode_table;
     private $postalcode_lat_field;
@@ -55,7 +62,7 @@ class geo_search {
     /**
      * Get API key from config if 'config' is passed, otherwise return the provided key
      */
-    private function getApiKey($key) 
+    private function getApiKey($key)
     {
         if ($key === 'config') {
             return rex_addon::get('yform_geo_osm')->getConfig('geoapifykey');
@@ -65,7 +72,7 @@ class geo_search {
 
     /**
      * Geocode a single address
-     * 
+     *
      * @param string $street
      * @param string $city
      * @param string $postalcode
@@ -79,7 +86,7 @@ class geo_search {
 
     /**
      * Geocode any address string
-     * 
+     *
      * @param string $address Complete address string
      * @return array|null ['lat' => float, 'lng' => float]
      */
@@ -88,7 +95,8 @@ class geo_search {
         return $this->getCoordinates($address);
     }
 
-    private function getIdByPostalcode($postalcode) {
+    private function getIdByPostalcode($postalcode)
+    {
         $sql = rex_sql::factory()->getArray('
             SELECT
                 id,'.$this->postalcode_postalcode_field.'
@@ -99,12 +107,14 @@ class geo_search {
             LIMIT 0,1
         ', [':postalcode' => $postalcode]);
 
-        if($sql)
+        if ($sql) {
             return $sql[0]['id'];
+        }
         return -1;
     }
 
-    public function searchByPostalcode($postalcode, $radius) {
+    public function searchByPostalcode($postalcode, $radius)
+    {
         $id = $this->getIdByPostalcode($postalcode);
 
         $sql = rex_sql::factory()->getArray('
@@ -122,12 +132,13 @@ class geo_search {
             ORDER BY distance', [
             ':id' => $id,
             ':distance' => intval($radius)
-        ] );
+        ]);
 
         return $sql;
     }
 
-    public function searchByLatLng($lat, $lng, $radius) {
+    public function searchByLatLng($lat, $lng, $radius)
+    {
         // folgt...
     }
 
@@ -155,7 +166,7 @@ class geo_search {
             throw new Exception('Not configured for bulk geocoding. Use forBulkGeocoding() instead.');
         }
 
-        $address = implode(' ', array_map(function($field) use ($record) {
+        $address = implode(' ', array_map(function ($field) use ($record) {
             return $record[$field] ?? '';
         }, $this->addressFields));
 
