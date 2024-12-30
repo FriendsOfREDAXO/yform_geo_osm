@@ -239,7 +239,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
             [
                 ':ti' => 'value',
-             ':tn' => $self->getParam('form_hiddenfields')['table_name'],
+                ':tn' => $self->getParam('form_hiddenfields')['table_name'],
             ],
             PDO::FETCH_KEY_PAIR,
         );
@@ -266,9 +266,8 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     /**
      * Validator für die Feld-Konfiguration
      * 
-     * Überprüft, ob die angegebenen Felder für Adress-Teile existieren.
+     * Überprüft, ob die Angaben zu no_db hier und in den latlng-Felder korrelieren.
      * Wenn nein: Fehlermeldung.
-     * Wenn ja: schon mal versehentlich eingegebene Leerzeichen entfernen.
      * 
      * @param array<rex_yform_value_abstract> $fields
      */
