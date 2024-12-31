@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @var array<string> $addressfields
- * @var array<string> $geofields
+ * @var array<string, rex_yform_value_abstract> $addressfields
+ * @var array<string, rex_yform_value_abstract> $geofields
  * @var string $mapbox_token
  * @var int $height
  * @var rex_yform_value_osm_geocode $this
@@ -13,24 +13,13 @@ $class_label = 'control-label';
 
 $address_selectors = [];
 foreach ($addressfields as $afield) {
-    /** @var rex_yform_value_abstract $val */
-    foreach ($this->params['values'] as $val) {
-        if ($val->getName() === $afield) {
-            $address_selectors[] = '#' . $val->getFieldId();
-        }
-    }
+	$address_selectors[] = '#' . $afield->getFieldId();
 }
 
-$geo_selectors = [];
-/** @var rex_yform_value_abstract $val */
-foreach ($this->params['values'] as $val) {
-    if ($val->getName() === $geofields[0]) {
-        $geo_selectors['lat'] = '#' . $val->getFieldId();
-    }
-    if ($val->getName() === $geofields[1]) {
-        $geo_selectors['lng'] = '#' . $val->getFieldId();
-    }
-}
+$geo_selectors = [
+	'lat' => '#' . $geofields[0]->getFieldId(),
+	'lng' => '#' . $geofields[1]->getFieldId(),
+];
 
 $js = '<script type="text/javascript">
     jQuery(function($){
