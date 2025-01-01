@@ -106,7 +106,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     public function getDescription(): string
     {
-        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[mapbox_token]|[no_db]';
+        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|class|[mapbox_token]|[no_db]';
     }
 
     /**
