@@ -17,11 +17,18 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
 
     // Map initialization
     var map;
+    let mapOptions = {
+        center: [current_lat, current_lng],
+        zoom: 16,
+        gestureHandling: true,
+        duration: 500,
+    }
     if(mapbox_token=='') {
-        map = L.map('map-'+id).setView([current_lat, current_lng], 16);
-        L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+        let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        });
+        mapOptions.layers = [streets];
+        map = L.map('map-'+id,mapOptions); //.setView([current_lat, current_lng], 16);
     } else {
         var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -32,11 +39,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
             {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-        map = L.map('map-'+id, {
-            center: [current_lat, current_lng],
-            zoom: 16,
-            layers: [streets, streets_sattelite]
-        });
+        mapOptions.layers = [streets, streets_sattelite];
+        map = L.map('map-'+id, mapOptions);
 
         var baseMaps = {
             "Map": streets,
