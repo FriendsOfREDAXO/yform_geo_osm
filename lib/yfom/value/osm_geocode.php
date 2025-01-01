@@ -52,9 +52,9 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             if (null === $value) {
                 $value = ',';
             }
-            [$lat, $lng, $rest] = explode(',', $value . ',');
-            $this->latField->setValue($lat);
-            $this->lngField->setValue($lng);
+            $latLng = array_merge(explode(',', $value), ['','']);
+            $this->latField->setValue($latLng[0]);
+            $this->lngField->setValue($latLng[1]);
         }
     }
 
@@ -66,8 +66,15 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     public function enterObject(): void
     {
-        $addressfields = explode(',', str_replace(' ', '', $this->getElement('address')));
-        $geofields = [$this->latField->getName(), $this->lngField->getName()];
+        $fields = array_filter(explode(',', $this->getElement('address')),strlen(...));
+        $addressfields = [];
+        /** @var rex_yform_value_abstract $val */
+        foreach( $this->getParam('values') as $val) {
+            if(in_array($val->getName(),$fields,true)) {
+                $addressfields[$val->getName()] = $val;
+            }
+        }
+        $geofields = [$this->latField, $this->lngField];
         $height = (int) $this->getElement('height');
         $mapbox_token = $this->getElement('mapbox_token');
 
