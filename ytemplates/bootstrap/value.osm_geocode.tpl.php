@@ -35,6 +35,16 @@ rex_extension::register('OUTPUT_FILTER', '\FriendsOfRedaxo\YFormGeoOsm\Assets::a
 $fragment = new rex_fragment();
 $items = [];
 
+$items[] = [
+    'label' => '<i class="fa-solid fa-arrows-to-circle"></i>&nbsp;',
+    'attributes' => [
+        'class' => ['btn-default', 'map-center'],
+        'type' => 'button',
+        'id' => 'center-geo-' . $this->getId(),
+    ],
+];
+
+
 if (0 < count($address_selectors)) {
     $items[] = [
         'label' => '<i class="fa-solid fa-map-marker-alt"></i> ' . rex_i18n::msg('yform_geo_osm_get_coords'),
@@ -47,7 +57,7 @@ if (0 < count($address_selectors)) {
 }
 
 $items[] = [
-    'label' => '<i class="fa-solid fa-location-crosshairs"></i> ' . rex_i18n::msg('yform_geo_osm_search_address'),
+    'label' => '<i class="fa-solid fa-magnifying-glass"></i> ' . rex_i18n::msg('yform_geo_osm_search_address'),
     'attributes' => [
         'class' => ['btn-primary', 'search'],
         'type' => 'button',
