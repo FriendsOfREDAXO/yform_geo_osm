@@ -75,11 +75,19 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             }
         }
         $geofields = [$this->latField, $this->lngField];
-        $height = (int) $this->getElement('height');
+        $mapclass = $this->getElement('format');
+        $height = $this->getElement('height');
+        if( '' === $mapclass && is_numeric($height)) {
+            $height = $height . 'px';
+        }
+
         $mapbox_token = $this->getElement('mapbox_token');
+        $This = $this;
+        dump(get_defined_vars());
+        
 
         if ($this->needsOutput()) {
-            $this->params['form_output'][$this->getId()] = $this->parse('value.osm_geocode.tpl.php', compact('addressfields', 'geofields', 'height', 'mapbox_token'));
+            $this->params['form_output'][$this->getId()] = $this->parse('value.osm_geocode.tpl.php', compact('addressfields', 'geofields', 'height', 'mapclass', 'mapbox_token'));
         }
 
         /**
@@ -132,6 +140,12 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'height' => [
                         'type' => 'text',
                         'label' => 'Map-H&ouml;he',
+                        'notice' => 'Angabe als Integer-Zahl ggf, mit Masseinheit px(defaut) | em | rem | vh. Als Alternative zur CSS-Klasse; nur Map-H&ouml;he ODER CSS-Klasse angeben!',
+                    ],
+                'format' => [
+                        'type' => 'text',
+                        'label' => 'CSS-Klasse',
+                        'notice' => 'Als Alternative zur Map-H&ouml;he für komplexe Karten-Layouts; nur Map-H&ouml;he ODER CSS-Klasse angeben!',
                     ],
                 'mapbox_token' => [
                         'type' => 'text',
@@ -147,6 +161,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 ['customfunction' => ['name' => 'latlng', 'function' => $this->validateLatLng(...)]],
                 ['customfunction' => ['name' => 'address', 'function' => $this->validateAddress(...)]],
                 ['customfunction' => ['name' => 'no_db', 'function' => $this->validateNoDb(...)]],
+                ['customfunction' => ['name' => ['height','format'], 'function' => $this->validateLayout(...)]],
             ],
             'description' => 'Openstreetmap Positionierung',
             'dbtype' => 'varchar(191)',
@@ -322,4 +337,75 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         }
         return false;
     }
+
+    /**
+     * Validator für die Feld-Konfiguration
+     * 
+     * Überprüft, ob die Angaben zur Kartenformatierung (height bzw. format) korrekt sind
+     * - nur eines der beiden Felder darf gefüllt sein
+     * - die Höhe (height) muss eine Integer-Zahl sein, ggf. mit einer Massangabe
+     * - die Mssangabe darf sein px, em, rm oder vh. px ist default
+     * - wenn kein Feld gefüllt ist, wird 400px als Höhe eingetragen (default)
+     * - Die Eingabe darf mit Leerzeichen sein, die hier entfernt werden.
+     *  
+     * @param string[] $field_name
+     * @param array<string, string> $value
+     * @param array<rex_yform_value_abstract> $fields
+     */
+    protected function validateLayout(array $field_name, array $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
+    {
+        /**
+         * Ist überhaupt in beiden Feldern etwas angegeben? Wenn nein: Höhe auf 400px setzen
+         */
+        $value = array_map(trim(...),$value);
+        $value = array_filter($value,strlen(...));
+        if( 0 === count($value)) {
+            $fields['height']->setValue('400px');
+            return false;
+        }
+
+        /**
+         * Beide Werte sind angegeben -> Meckern
+         */
+        if( 2 === count($value)) {
+            $self->setElement(
+                'message',
+                'Bitte nur die «Map-H&ouml;he»  oder die «CSS-Klasse» angeben!',
+            );
+            return true;
+        }
+
+        /**
+         * Die CSS-Klasse als einziges Feld wird nicht weiter analysiert
+         * Wert getrimmed setzen
+         */
+        if( 'format' === key($value)) {
+            $fields['format']->setValue($value['format']);
+            return false;
+        }
+
+        /**
+         * Die Höhe muss ein reiner Integer-Wert sein oder ein Int-Wert mit Masseinheit.
+         * px, em, rem, vh
+         */
+        $ok = preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@',$value['height'],$match);
+        if( 0 === $ok) {
+            $self->setElement(
+                'message',
+                sprintf(
+                    'Ungültige Eingabe «%s»; bitte nur eine Integer-Zahl sowie eine der zulässigen Masseinheiten eingeben',
+                    $value['height'],
+                ),
+            );
+            return true;
+        }
+        $match = array_merge(
+            ['height' => '', 'unit' => 'px'],
+            $match,
+        );
+        $fields['height']->setValue(sprintf('%d%s',$match['height'],$match['unit']));
+        return false;
+    }
+
+    
 }
