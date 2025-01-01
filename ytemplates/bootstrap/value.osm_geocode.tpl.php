@@ -4,7 +4,8 @@
  * @var array<string, rex_yform_value_abstract> $addressfields
  * @var array<string, rex_yform_value_abstract> $geofields
  * @var string $mapbox_token
- * @var int $height
+ * @var string $height
+ * @var string $mapclass
  * @var rex_yform_value_osm_geocode $this
  */
 
@@ -13,12 +14,12 @@ $class_label = 'control-label';
 
 $address_selectors = [];
 foreach ($addressfields as $afield) {
-	$address_selectors[] = '#' . $afield->getFieldId();
+    $address_selectors[] = '#' . $afield->getFieldId();
 }
 
 $geo_selectors = [
-	'lat' => '#' . $geofields[0]->getFieldId(),
-	'lng' => '#' . $geofields[1]->getFieldId(),
+    'lat' => '#' . $geofields[0]->getFieldId(),
+    'lng' => '#' . $geofields[1]->getFieldId(),
 ];
 
 $js = '<script type="text/javascript">
@@ -35,6 +36,15 @@ rex_extension::register('OUTPUT_FILTER', '\FriendsOfRedaxo\YFormGeoOsm\Assets::a
 $fragment = new rex_fragment();
 $items = [];
 
+$items[] = [
+    'label' => '<i class="fa-solid fa-arrows-to-circle"></i>&nbsp;',
+    'attributes' => [
+        'class' => ['btn-default', 'map-center'],
+        'type' => 'button',
+        'id' => 'center-geo-' . $this->getId(),
+    ],
+];
+
 if (0 < count($address_selectors)) {
     $items[] = [
         'label' => '<i class="fa-solid fa-map-marker-alt"></i> ' . rex_i18n::msg('yform_geo_osm_get_coords'),
@@ -47,7 +57,7 @@ if (0 < count($address_selectors)) {
 }
 
 $items[] = [
-    'label' => '<i class="fa-solid fa-location-crosshairs"></i> ' . rex_i18n::msg('yform_geo_osm_search_address'),
+    'label' => '<i class="fa-solid fa-magnifying-glass"></i> ' . rex_i18n::msg('yform_geo_osm_search_address'),
     'attributes' => [
         'class' => ['btn-primary', 'search'],
         'type' => 'button',
@@ -64,11 +74,19 @@ $items[] = [
     ],
 ];
 
+$mapAttributes = [
+    'id' => 'map-' . $this->getId(),
+];
+if ('' === $mapclass) {
+    $mapAttributes['style'] = sprintf('height: %s; margin-top:5px;', $height);
+} else {
+    $mapAttributes['class'] = $mapclass;
+}
+
 $fragment->setVar('buttons', $items, false);
 $buttonHTML = $fragment->parse('core/buttons/button_group.php');
 
 ?>
-
 <div class="<?= $class_group ?>"
 	id="<?= $this->getHTMLId('osm') ?>">
 	<label
@@ -76,8 +94,7 @@ $buttonHTML = $fragment->parse('core/buttons/button_group.php');
 
 	<br><?= $buttonHTML ?>
 
-	<div id="map-<?= $this->getId()?>"
-		style="height:<?= $height?>px; margin-top:5px;"></div>
+	<div <?= rex_string::buildAttributes($mapAttributes) ?>></div>
 
 	<!-- Search Modal -->
 	<div class="rex-geo-search-modal"

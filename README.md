@@ -123,7 +123,7 @@ $yform->setValueField('text', ['postalcode','PLZ','','0']);
 $yform->setValueField('text', ['city','Ort','','0']);
 $yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','0']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
 
 echo $yform->getForm();
 ```
@@ -136,7 +136,7 @@ werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank spe
 ```php
 $yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','1']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','1']);
 ```
 
 *Beispiel 2: Koordinaten als Kombiwert (`lat,lng`) in `osm` speichern*
@@ -144,7 +144,7 @@ $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,c
 ```php
 $yform->setValueField('number', ['lat','LAT','10','7','','1','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','1','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','0']);
+$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
 ```
 
 ### Batch-Geokodierung in YForm

@@ -10,6 +10,7 @@ function rex_geo_osm_get_address(addressfields) {
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     var current_lat = $(geofields.lat).val() || 51.1657;
     var current_lng = $(geofields.lng).val() || 10.4515;
+    let defaultZoom = 16;
 
     L.Map.addInitHook(function () {
         this.getContainer()._leaflet_map = this;
@@ -17,11 +18,18 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
 
     // Map initialization
     var map;
+    let mapOptions = {
+        center: [current_lat, current_lng],
+        zoom: defaultZoom,
+        gestureHandling: true,
+        duration: 500,
+    }
     if(mapbox_token=='') {
-        map = L.map('map-'+id).setView([current_lat, current_lng], 16);
-        L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+        let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        });
+        mapOptions.layers = [streets];
+        map = L.map('map-'+id,mapOptions);
     } else {
         var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -32,11 +40,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
             {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-        map = L.map('map-'+id, {
-            center: [current_lat, current_lng],
-            zoom: 16,
-            layers: [streets, streets_sattelite]
-        });
+        mapOptions.layers = [streets, streets_sattelite];
+        map = L.map('map-'+id, mapOptions);
 
         var baseMaps = {
             "Map": streets,
@@ -57,7 +62,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     $(geofields.lat+','+geofields.lng).on('keyup', function() {
         var lat = $(geofields.lat).val();
         var lng = $(geofields.lng).val();
-        map.setView([lat, lng], 16);
+        map.setView([lat, lng], defaultZoom);
         marker.setLatLng([lat, lng]);
     });
 
@@ -121,7 +126,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     function selectLocation(location) {
         $(geofields.lat).val(location.lat);
         $(geofields.lng).val(location.lon);
-        map.setView([location.lat, location.lon], 16);
+        map.setView([location.lat, location.lon], defaultZoom);
         marker.setLatLng([location.lat, location.lon]);
         $('#rex-geo-search-modal-'+id).hide();
         $('#rex-geo-search-input-'+id).val('');
@@ -136,7 +141,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 var lng = position.coords.longitude;
                 $(geofields.lat).val(lat);
                 $(geofields.lng).val(lng);
-                map.setView([lat, lng], 16);
+                map.setView([lat, lng], defaultZoom);
                 marker.setLatLng([lat, lng]);
             }, function(error) {
                 alert("Geolocation failed: " + error.message);
@@ -145,6 +150,13 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             alert("Your browser doesn't support geolocation.");
         }
     });
+
+    // Recenter the map to the curent marker-position
+    $('#center-geo-'+id).on('click', function(e) {
+        e.preventDefault();
+        map.setView(marker.getLatLng(), defaultZoom);
+
+    });        
 
     // Original address geocoding
     $('#set-geo-'+id).on('click', function(e) {
@@ -169,7 +181,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 }
                 $(geofields.lat).val(json[0].lat);
                 $(geofields.lng).val(json[0].lon);
-                map.setView([json[0].lat, json[0].lon], 16);
+                map.setView([json[0].lat, json[0].lon], defaultZoom);
                 marker.setLatLng([json[0].lat, json[0].lon]);
             } else {
                 console.log('An error occurred.');
