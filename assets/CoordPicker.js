@@ -65,20 +65,20 @@ class CoordPicker {
             this.map.remove();
         }
 
-        // Standardmäßig die Karte auf Frankfurt setzen
+        // Standardmäßig die Karte auf Frankfurt setzen und ganze Welt anzeigen
         let initialLat = 50.1109221; //ungefähre Mitte von Frankfurt
         let initialLng = 8.6821267;
-        let initialZoom = 13; // Zoomstufe um Frankfurt anzuzeigen
+        let initialZoom = 2; // Zoomstufe um die ganze Welt anzuzeigen
 
         // Wenn valide Koordinaten übergeben werden, diese anwenden
         if(typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
-             initialLat = lat;
-             initialLng = lng;
-             initialZoom = 14;  // Angepasste Zoomstufe bei validen Koordinaten
+            initialLat = lat;
+            initialLng = lng;
+            initialZoom = 14; // Zoomstufe für eine bessere Detailansicht
         }
 
         this.map = L.map('rex-coord-map').setView([initialLat, initialLng], initialZoom);
-        
+
         if (this.mapboxToken) {
             L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + this.mapboxToken, {
                 id: 'mapbox.streets',
@@ -93,7 +93,7 @@ class CoordPicker {
         this.marker = L.marker([initialLat, initialLng], {
             draggable: true
         }).addTo(this.map);
-        
+
     }
 
     async performSearch(searchText) {
