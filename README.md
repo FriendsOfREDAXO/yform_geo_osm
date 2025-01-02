@@ -211,7 +211,7 @@ MIT-Lizenz, siehe [LICENSE](LICENSE)
 
 **Project Lead**
 
-[NGWNGW](https://github.com/NGWNGW)
+[Alexander Walther](https://github.com/alxndr-w)
 
 **Weitere Credits**
 
