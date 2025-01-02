@@ -83,8 +83,6 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 
         $mapbox_token = $this->getElement('mapbox_token');
         $This = $this;
-        dump(get_defined_vars());
-        
 
         if ($this->needsOutput()) {
             $this->params['form_output'][$this->getId()] = $this->parse('value.osm_geocode.tpl.php', compact('addressfields', 'geofields', 'height', 'mapclass', 'mapbox_token'));
