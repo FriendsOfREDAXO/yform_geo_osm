@@ -25,4 +25,5 @@ yform_geo_osm_label_mapbox_token = Mapbox-Token
 yform_geo_osm_notice_coord_fields = Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»
 yform_geo_osm_notice_address_fields = Namen der Felder mit Adressen-Elementen zur Positionsfindung; Bsp.: «strasse,plz,ort»
 yform_geo_osm_notice_format = JSON-Objekt für Kartenformatierung und initiale Einstellungen. Beispiel: {"class":"wide","data-init-lat":"48.8566","data-init-lng":"2.3522","data-init-zoom":"10"}
+yform_geo_osm_notice_height = Angabe als Integer-Zahl ggf. mit Masseinheit px(default) | em | rem | vh. Legacy-Option, wird ignoriert wenn Format gesetzt ist.
 yform_geo_osm_notice_mapbox_token = (optional)
