@@ -65,16 +65,16 @@ class CoordPicker {
             this.map.remove();
         }
 
-        // Standardmäßig die Karte auf Europa setzen
-        let initialLat = 54.5260; //ungefähre Mitte von Europa
-        let initialLng = 15.2551;
-        let initialZoom = 4; // Zoomstufe um Europa anzuzeigen
+        // Standardmäßig die Karte auf Frankfurt setzen
+        let initialLat = 50.1109221; //ungefähre Mitte von Frankfurt
+        let initialLng = 8.6821267;
+        let initialZoom = 13; // Zoomstufe um Frankfurt anzuzeigen
 
-       // Wenn valide Koordinaten übergeben werden, diese anwenden
+        // Wenn valide Koordinaten übergeben werden, diese anwenden
         if(typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
              initialLat = lat;
              initialLng = lng;
-             initialZoom = 16;
+             initialZoom = 14;  // Angepasste Zoomstufe bei validen Koordinaten
         }
 
         this.map = L.map('rex-coord-map').setView([initialLat, initialLng], initialZoom);
