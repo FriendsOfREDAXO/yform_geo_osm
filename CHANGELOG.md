@@ -3,8 +3,21 @@
 ## Version 2.0.0 //
 
 * Umstellung auf FriendsOfREDAXO-Namespace. @alxndr-w
-* Sprachdateien aktualisiert.
+* Geopicker für Module oder AddOns @skerbis
+* Sprachdateien aktualisiert  @skerbis
 * Von rexstan gemeldete Code-Verbesserungen umgesetzt. @alxndr-w @christophboecker
+* Konfiguration per JSON möglich, ersetzt das Height-Feld  @skerbis
+  * style und class Attribute
+  * Initiale Kartenposition (data-init-lat, data-init-lng)
+  * Initiales Zoom-Level (data-init-zoom)
+* Dark Mode Unterstützung verbessert:  @skerbis
+  * Integration der REDAXO Standard CSS-Variablen
+  * Optimierte Kartendarstellung
+  * Verbesserte Kontraste
+* UX Verbesserungen:  @skerbis
+  * Marker wird nicht mehr initial angezeigt
+  * Erscheint erst bei Positionsauswahl
+  * Verbesserte Transitionen
 
 ## Version 1.4.0 // 27.12.2024
 
