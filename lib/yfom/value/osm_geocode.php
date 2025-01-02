@@ -39,7 +39,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 }
             }
             if (null === $this->latField || null === $this->lngField) {
-                throw new rex_functional_exception('Konfigurationsfehler im Feld ' . $this->getName() . ': lat/lng');
+                throw new rex_functional_exception(rex_i18n::msg('yform_geo_osm_error_coordinates'));
             }
         }
 
@@ -75,22 +75,44 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             }
         }
         $geofields = [$this->latField, $this->lngField];
-        $mapclass = $this->getElement('format');
+
+        $format = $this->getElement('format');
+        $formatData = [];
         $height = $this->getElement('height');
-        if( '' === $mapclass && is_numeric($height)) {
-            $height = $height . 'px';
+        
+        if (!empty($format)) {
+            try {
+                $formatData = json_decode($format, true, 512, JSON_THROW_ON_ERROR);
+                if (!is_array($formatData)) {
+                    throw new \Exception('Invalid JSON format');
+                }
+                // Height wird ignoriert wenn formatData gesetzt ist
+                $height = '';
+            } catch (\Exception $e) {
+                throw new rex_functional_exception(rex_i18n::msg('yform_geo_osm_error_format'));
+            }
+        } else {
+            // Fallback: Wenn keine formatData, dann height verwenden
+            if ($height !== '' && is_numeric($height)) {
+                $height = $height . 'px';
+            }
+        }
+
+        // ID kann nicht überschrieben werden
+        if (isset($formatData['id'])) {
+            unset($formatData['id']);
         }
 
         $mapbox_token = $this->getElement('mapbox_token');
         $This = $this;
 
         if ($this->needsOutput()) {
-            $this->params['form_output'][$this->getId()] = $this->parse('value.osm_geocode.tpl.php', compact('addressfields', 'geofields', 'height', 'mapclass', 'mapbox_token'));
+            $this->params['form_output'][$this->getId()] = $this->parse(
+                'value.osm_geocode.tpl.php', 
+                compact('addressfields', 'geofields', 'formatData', 'mapbox_token', 'height')
+            );
         }
 
-        /**
-         * Lat und Lng wieder zusammenfassen und speichern.
-         */
         $this->setValue(sprintf('%s,%s', $this->latField->getValue(), $this->lngField->getValue()));
 
         $this->params['value_pool']['email'][$this->getName()] = $this->getValue();
@@ -104,7 +126,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     public function getDescription(): string
     {
-        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|class|[mapbox_token]|[no_db]';
+        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|{"class":"wide","data-init-lat":"48.8566"}|[height]|[mapbox_token]|[no_db]';
     }
 
     /**
@@ -119,36 +141,36 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             'values' => [
                 'name' => [
                         'type' => 'name',
-                        'label' => 'Name',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_name'),
                     ],
                 'label' => [
                         'type' => 'text',
-                        'label' => 'Bezeichnung',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_label'),
                     ],
                 'latlng' => [
                         'type' => 'text',
-                        'label' => 'Koordinaten-Felder',
-                        'notice' => 'Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_coord_fields'),
+                        'notice' => rex_i18n::msg('yform_geo_osm_notice_coord_fields'),
                     ],
                 'address' => [
                         'type' => 'text',
-                        'label' => 'Adressen-Felder',
-                        'notice' => 'Namen der Felder mit Adressen-Elementen zur Positionsfindung; Bsp.: «strasse,plz,ort»',
-                    ],
-                'height' => [
-                        'type' => 'text',
-                        'label' => 'Map-H&ouml;he',
-                        'notice' => 'Angabe als Integer-Zahl ggf, mit Masseinheit px(defaut) | em | rem | vh. Als Alternative zur CSS-Klasse; nur Map-H&ouml;he ODER CSS-Klasse angeben!',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_address_fields'),
+                        'notice' => rex_i18n::msg('yform_geo_osm_notice_address_fields'),
                     ],
                 'format' => [
                         'type' => 'text',
-                        'label' => 'CSS-Klasse',
-                        'notice' => 'Als Alternative zur Map-H&ouml;he für komplexe Karten-Layouts; nur Map-H&ouml;he ODER CSS-Klasse angeben!',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_format'),
+                        'notice' => rex_i18n::msg('yform_geo_osm_notice_format'),
+                    ],
+                'height' => [
+                        'type' => 'text',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_height'),
+                        'notice' => rex_i18n::msg('yform_geo_osm_notice_height'),
                     ],
                 'mapbox_token' => [
                         'type' => 'text',
-                        'label' => 'Mapbox-Token',
-                        'notice' => '(optional)',
+                        'label' => rex_i18n::msg('yform_geo_osm_label_mapbox_token'),
+                        'notice' => rex_i18n::msg('yform_geo_osm_notice_mapbox_token'),
                     ],
                 'no_db' => [
                         'type' => 'no_db',
@@ -159,7 +181,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 ['customfunction' => ['name' => 'latlng', 'function' => $this->validateLatLng(...)]],
                 ['customfunction' => ['name' => 'address', 'function' => $this->validateAddress(...)]],
                 ['customfunction' => ['name' => 'no_db', 'function' => $this->validateNoDb(...)]],
-                ['customfunction' => ['name' => ['height','format'], 'function' => $this->validateLayout(...)]],
+                ['customfunction' => ['name' => 'format', 'function' => $this->validateFormat(...)]],
             ],
             'description' => '🧩 yform_geo_osm: OpenStreetMap-Karte und Geoocodierung',
             'dbtype' => 'varchar(191)',
@@ -180,28 +202,15 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     protected function validateLatLng(string $field_name, string $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
-        /**
-         * Eingabe in ein Array auflösen und formal bereinigen.
-         */
         $coord_field_names = array_map(trim(...), explode(',', $value));
         $coord_field_names = array_filter($coord_field_names, strlen(...));
         $coord_field_names = array_unique($coord_field_names);
 
-        /**
-         * Fehler 1: mehr oder weniger als zwei Felder angegeben.
-         */
         if (2 !== count($coord_field_names)) {
-            $self->setElement(
-                'message',
-                'Bitte genau zwei Felder für Breiten- und Längengrade (lat, lng) angeben.'
-            );
+            $self->setElement('message', rex_i18n::msg('yform_geo_osm_error_coordinates'));
             return true;
         }
 
-        /**
-         * Liste der Feldnamen in der Tabelle abrufen und ermitteln, welches angegebene Feld
-         * nicht im Formular vorkommt.
-         */
         $sql = rex_sql::factory();
         $field_list = $sql->getArray(
             'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn', 
@@ -212,21 +221,15 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             PDO::FETCH_KEY_PAIR,
         );
 
-        /**
-         * Fehler 2: unbekanntes Feld.
-         */
         $unknown_fields = array_diff($coord_field_names, $field_list);
         if (0 < count($unknown_fields)) {
             $self->setElement(
                 'message',
-                sprintf('Koordinaten-Feld unbekannt: «%s»', implode('», «', $unknown_fields))
+                sprintf(rex_i18n::msg('yform_geo_osm_error_unknown_field'), implode('», «', $unknown_fields))
             );
             return true;
         }
 
-        /**
-         * formal bereinigte Liste in das Feld zurückgeben.
-         */
         $fields[$field_name]->setValue(implode(',', $coord_field_names));
         $this->latLngInput = $fields[$field_name];
         return false;
@@ -243,17 +246,10 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     protected function validateAddress(string $field_name, string $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
-        /**
-         * Eingabe in ein Array auflösen und formal bereinigen.
-         */
         $address_field_names = array_map(trim(...), explode(',', $value));
         $address_field_names = array_filter($address_field_names, strlen(...));
         $address_field_names = array_unique($address_field_names);
 
-        /**
-         * Liste der Feldnamen in der Tabelle abrufen und ermitteln, welches angegebene Feld
-         * nicht im Formular vorkommt.
-         */
         $sql = rex_sql::factory();
         $field_list = $sql->getArray(
             'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
@@ -264,21 +260,15 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             PDO::FETCH_KEY_PAIR,
         );
 
-        /**
-         * Fehler: unbekanntes Feld.
-         */
         $unknown_fields = array_diff($address_field_names, $field_list);        
         if (0 < count($unknown_fields)) {
             $self->setElement(
                 'message',
-                sprintf('Adress-Feld unbekannt: «%s»', implode('», «', $unknown_fields))
+                sprintf(rex_i18n::msg('yform_geo_osm_error_address_field'), implode('», «', $unknown_fields))
             );
             return true;
         }
 
-        /**
-         * formal bereinigte Liste in das Feld zurückgeben.
-         */
         $fields[$field_name]->setValue(implode(',', $address_field_names));
         return false;
     }
@@ -293,17 +283,10 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     protected function validateNoDb(string $field_name, ?int $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
-        /**
-         * Überspringen wenn selbst speicherbar bzw. die LatLng-Überprüfung gescheitert ist.
-         */
-        if( $value === null || $value === 0 || !isset($this->latLngInput)) {
+        if ($value === null || $value === 0 || !isset($this->latLngInput)) {
             return false;
         }
 
-        /**
-         * Die Lat/Lng-Felder identifizieren und auf _no_db prüfen
-         * Dass es zwei sind muss hier nicht mehr überprüft werden.
-         */
         $fields = explode(',',$this->latLngInput->getValue());
         $sql = rex_sql::factory();
         $result = $sql->getArray(
@@ -318,14 +301,11 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             PDO::FETCH_KEY_PAIR,
         );
 
-        /**
-         * Fehler: Wenn es mindestens ein no_db-Koordinatenfeld gibt
-         */
-        if( 0 !== count($result)) {
+        if (0 !== count($result)) {
             $self->setElement(
                 'message',
                 sprintf(
-                    '"%s" kollidiert mit der Feldkonfiguration von «%s»; Beide Koordinatenfelder («%s») müssen speicherbar sein, wenn dieses Feld nicht speicherbar ist',
+                    rex_i18n::msg('yform_geo_osm_error_no_db_conflict'),
                     rex_i18n::msg('yform_donotsaveindb'),
                     implode('» bzw. «', $result),
                     implode('», «', $fields),
@@ -339,71 +319,26 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     /**
      * Validator für die Feld-Konfiguration
      * 
-     * Überprüft, ob die Angaben zur Kartenformatierung (height bzw. format) korrekt sind
-     * - nur eines der beiden Felder darf gefüllt sein
-     * - die Höhe (height) muss eine Integer-Zahl sein, ggf. mit einer Massangabe
-     * - die Mssangabe darf sein px, em, rm oder vh. px ist default
-     * - wenn kein Feld gefüllt ist, wird 400px als Höhe eingetragen (default)
-     * - Die Eingabe darf mit Leerzeichen sein, die hier entfernt werden.
-     *  
-     * @param string[] $field_name
-     * @param array<string, string> $value
+     * Überprüft, ob das Format-Feld ein gültiges JSON enthält
+     * 
      * @param array<rex_yform_value_abstract> $fields
      */
-    protected function validateLayout(array $field_name, array $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
+    protected function validateFormat(string $field_name, string $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
-        /**
-         * Ist überhaupt in beiden Feldern etwas angegeben? Wenn nein: Höhe auf 400px setzen
-         */
-        $value = array_map(trim(...),$value);
-        $value = array_filter($value,strlen(...));
-        if( 0 === count($value)) {
-            $fields['height']->setValue('400px');
+        if (empty(trim($value))) {
             return false;
         }
 
-        /**
-         * Beide Werte sind angegeben -> Meckern
-         */
-        if( 2 === count($value)) {
-            $self->setElement(
-                'message',
-                'Bitte nur die «Map-H&ouml;he»  oder die «CSS-Klasse» angeben!',
-            );
+        try {
+            $formatData = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($formatData)) {
+                throw new \Exception('Invalid JSON format');
+            }
+        } catch (\Exception $e) {
+            $self->setElement('message', rex_i18n::msg('yform_geo_osm_error_format'));
             return true;
         }
 
-        /**
-         * Die CSS-Klasse als einziges Feld wird nicht weiter analysiert
-         * Wert getrimmed setzen
-         */
-        if( 'format' === key($value)) {
-            $fields['format']->setValue($value['format']);
-            return false;
-        }
-
-        /**
-         * Die Höhe muss ein reiner Integer-Wert sein oder ein Int-Wert mit Masseinheit.
-         * px, em, rem, vh
-         */
-        $ok = preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@',$value['height'],$match);
-        if( 0 === $ok) {
-            $self->setElement(
-                'message',
-                sprintf(
-                    'Ungültige Eingabe «%s»; bitte nur eine Integer-Zahl sowie eine der zulässigen Masseinheiten eingeben',
-                    $value['height'],
-                ),
-            );
-            return true;
-        }
-        $match = array_merge(
-            ['height' => '', 'unit' => 'px'],
-            $match,
-        );
-        $fields['height']->setValue(sprintf('%d%s',$match['height'],$match['unit']));
         return false;
     }
-
-    
 }
