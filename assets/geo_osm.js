@@ -7,43 +7,30 @@ function rex_geo_osm_get_address(addressfields) {
     return out.join(",");
 }
 
-var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options = {}) {
+var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     
-    // Standardwerte für Frankfurt und Welt-Zoom, können durch options überschrieben werden
-    let initialLat = options.initialLat || 50.1109221;
-    let initialLng = options.initialLng || 8.6821267;
-    let initialZoom = options.initialZoom || 2;
-
     // Aktuelle Werte aus den Feldern holen
     var current_lat = $(geofields.lat).val();
     var current_lng = $(geofields.lng).val();
+
+    // Initialisierungswerte aus data-Attributen oder Defaults
+    let mapContainer = document.getElementById('map-'+id);
+    let initialLat = mapContainer.dataset.initLat || 50.1109221;
+    let initialLng = mapContainer.dataset.initLng || 8.6821267;
+    let initialZoom = parseInt(mapContainer.dataset.initZoom) || 2;
     let defaultZoom = current_lat && current_lng ? 14 : initialZoom;
    
-    L.Map.addInitHook(function () {
-        this.getContainer()._leaflet_map = this;
-    });
-
-    // Basis Map-Optionen
-    let defaultMapOptions = {
-        center: current_lat && current_lng ? [current_lat, current_lng] : [initialLat, initialLng],
-        zoom: defaultZoom,
-        gestureHandling: true,
-        duration: 500
-    };
-
-    // Map-Optionen mit benutzerdefinierten Optionen zusammenführen
-    let mapOptions = {
-        ...defaultMapOptions,
-        ...(options.mapOptions || {})
-    };
-    
     // Map initialization
     var map;
     if(mapbox_token=='') {
         let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
-        map = L.map('map-'+id, mapOptions).addLayer(streets);
+        map = L.map('map-'+id, {
+            center: current_lat && current_lng ? [current_lat, current_lng] : [initialLat, initialLng],
+            zoom: defaultZoom,
+            layers: [streets]
+        });
     } else {
         var mapboxAttribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -54,7 +41,11 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
             streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
             {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-        map = L.map('map-'+id, mapOptions).addLayer(streets);
+        map = L.map('map-'+id, {
+            center: current_lat && current_lng ? [current_lat, current_lng] : [initialLat, initialLng],
+            zoom: defaultZoom,
+            layers: [streets]
+        });
 
         var baseMaps = {
             "Map": streets,
@@ -65,15 +56,6 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
     }
 
     var marker = null;
-    var defaultMarkerOptions = {
-        draggable: true
-    };
-    
-    // Marker-Optionen mit benutzerdefinierten Optionen zusammenführen
-    var markerOptions = {
-        ...defaultMarkerOptions,
-        ...(options.markerOptions || {})
-    };
 
     // Marker nur erstellen wenn Koordinaten vorhanden sind
     if(current_lat && current_lng) {
@@ -84,12 +66,13 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
         if(marker) {
             marker.setLatLng([lat, lng]);
         } else {
-            marker = L.marker([lat, lng], markerOptions)
-                .on('dragend', function(ev) {
-                    var newPos = ev.target.getLatLng();
-                    $(geofields.lat).val(newPos.lat);
-                    $(geofields.lng).val(newPos.lng);
-                }).addTo(map);
+            marker = L.marker([lat, lng], {
+                draggable: true
+            }).on('dragend', function(ev) {
+                var newPos = ev.target.getLatLng();
+                $(geofields.lat).val(newPos.lat);
+                $(geofields.lng).val(newPos.lng);
+            }).addTo(map);
         }
     }
 
