@@ -32,6 +32,8 @@
 
 ### Format-Optionen (neu in 2.0.0)
 
+> Es ersetzt die Height-Angabe. Wird ein JSON gesetzt muss die Höhe über style oder class mitgegeben werden. 
+
 Die Kartenansicht kann über ein JSON-Objekt konfiguriert werden:
 
 ```json
