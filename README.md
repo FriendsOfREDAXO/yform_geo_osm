@@ -1,223 +1,130 @@
-# YForm Erweiterung: Geo (OSM)
+# YForm Geo OSM
 
-![Screenshot](https://github.com/FriendsOfREDAXO/yform_geo_osm/blob/assets/screen.png?raw=true)
+Dieses Addon erweitert YForm um ein Geo-Feld für OpenStreetMap zur Koordinatenauswahl.
 
-* YForm-Erweiterung, um eine Geocoding-Funktion einzubinden. Basierend auf OpenStreetMap
-* Anpassung der Geodaten über Map-Marker möglich
-* Live-Suche für Adressen mit Vorschlägen
-* Browser-Standortbestimmung
-* OpenStreetMap (Straßenkarte), optional Mapbox (Straßenkarte + Satellitenbilder)
-* PHP-Klasse `Search` für:
-  * Einzelne Adressabfragen
-  * Umkreissuche basierend auf Postleitzahlen
-  * Batch-Geocodierung von Adressen auch außerhalb von YForm
-
-## Installation
-
-* Paket herunterladen oder über den Installer installieren
-* Optional: Mapbox-Token für zusätzliche Kartenebenen (Layer)
-* Optional: Geoapify API-Key für erweiterte Geocoding-Funktionen
+![Screenshot](https://github.com/FriendsOfREDAXO/yform_geo_osm/assets/screenshots/yform_geo_osm.jpg)
 
 ## Features
 
-### YForm-Feld `osm_geocode`
+* OpenStreetMap Integration für YForm
+* Adresssuche via Nominatim
+* Browser-Geolocation Support
+* Standortsuche mit Live-Vorschau
+* Drag & Drop Marker für präzise Positionierung
+* Dark Mode Support
+* Optional: Mapbox Integration
 
-* Interaktive Kartenansicht mit Marker
-* Live-Adresssuche mit Vorschlägen
-* Direkte Übernahme des Browser-Standorts
-* Automatische Koordinaten-Ermittlung aus Adressfeldern
-* Dark-Mode unterstützt
-* Responsive-Design
+## Installation
 
-### Geocodierungs-Funktionen
+1. Im REDAXO Installer das Addon `yform_geo_osm` herunterladen
+2. Addon installieren und aktivieren
+3. Optional: Mapbox Token in den Einstellungen hinterlegen
 
-Die `Search`-Klasse bietet verschiedene Möglichkeiten der Geocodierung:
+## Verwendung in YForm
 
-> Hinweis: wenn man anstelle des API-Keys `config` schreibt, wird der API-Key der `config` übernommen.
+### 1. Geo-Feld anlegen
 
-#### 1. Abfrage einer einzelnen Adresse
+Das Geo-Feld kann im YForm Formbuilder oder in der Table Manager Definition hinzugefügt werden:
 
 ```php
+osm_geocode|geo_position|Position|pos_lat,pos_lng|strasse,plz,ort
+```
 
-namespace FriendsOfREDAXO\YFormGeoOSM;
+Parameter:
+1. Feldtyp (`osm_geocode`)
+2. Name des Feldes
+3. Label
+4. Koordinatenfelder (Latitude,Longitude)
+5. Adressfelder für die Koordinatenermittlung (optional)
+6. Format als JSON (optional)
+7. Mapbox Token (optional)
 
-// Geocoder initialisieren
-$geocoder = Search::forGeocoding('optional-api-key');
+### 2. Koordinatenfelder anlegen
 
-// Variante 1: Mit einzelnen Feldern
-$coords = $geocoder->geocodeAddress('Musterstr. 1', 'Berlin', '10115');
+Die benötigten Koordinatenfelder müssen separat angelegt werden:
 
-// Variante 2: Mit kompletter Adresse
-$coords = $geocoder->geocode('Musterstr. 1, 10115 Berlin');
+```php
+number|pos_lat|Latitude||
+number|pos_lng|Longitude||
+```
 
-if ($coords) {
-    echo "Latitude: {$coords['lat']}, Longitude: {$coords['lng']}";
+### 3. Format-Optionen (neu in 2.0.0)
+
+Die Kartenansicht kann über ein JSON-Objekt konfiguriert werden:
+
+```json
+{
+    "style": "height: 400px",
+    "data-init-lat": "52.5200",
+    "data-init-lng": "13.4050",
+    "data-init-zoom": "12"
 }
 ```
 
-#### 2. Batch-Geokodierung
+Verfügbare Optionen:
+* `style`: CSS-Styles für den Kartencontainer
+* `class`: CSS-Klassen für den Kartencontainer
+* `data-init-lat`: Initiale Latitude (Standard: 50.1109221)
+* `data-init-lng`: Initiale Longitude (Standard: 8.6821267)
+* `data-init-zoom`: Initiales Zoom-Level (Standard: 2)
 
-> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
+#### Legacy Format-Option
 
-```php
-use FriendsOfRedaxo\YFormGeoOsm\Search;
-// Geocoder für Massenverarbeitung initialisieren
-$geocoder = Search::forBulkGeocoding(
-    'rex_my_addresses',           // Tabellenname
-    ['street', 'zip', 'city'],    // Adressfelder
-    'latitude',                   // Feld für Breitengrad
-    'longitude',                  // Feld für Längengrad
-    'your-geoapify-api-key',      // Optional: API Key
-    200                          // Optional: Batch-Größe
-);
-
-// Batch verarbeiten
-$result = $geocoder->processBatch();
-printf(
-    "Verarbeitet: %d, Erfolgreich: %d, Fehlgeschlagen: %d",
-    $result['total'],
-    $result['success'],
-    $result['failed']
-);
-```
-
-#### 3. PLZ-Umkreissuche
-
-> Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
+Das Feld unterstützt aus Kompatibilitätsgründen auch noch die einfache Höhenangabe:
 
 ```php
-use FriendsOfRedaxo\YFormGeoOsm\Search;
-// Geocoder für PLZ-Suche initialisieren
-$geo = new Search(
-    [
-        'table' => 'rex_plz_data',
-        'lat_field' => 'lat',
-        'lng_field' => 'lng',
-        'postalcode_field' => 'plz'
-    ],
-    [
-        'table' => 'rex_my_addresses',
-        'lat_field' => 'latitude',
-        'lng_field' => 'longitude'
-    ]
-);
-
-// Suche nach Adressen im Umkreis von 50km um PLZ 12345
-$results = $geo->searchByPostalcode('12345', 50);
+osm_geocode|geo_position|Position|pos_lat,pos_lng|strasse,plz,ort|400
 ```
 
-### YForm Integration
+Diese wird aber nur verwendet, wenn keine JSON-Formatierung angegeben ist.
 
-#### Beispielmodul für YForm Frontend
+## Beispiele
+
+### Einfaches Geo-Feld
 
 ```php
-rex_extension::register('OUTPUT_FILTER', FriendsOfRedaxo\YFormGeoOSM\Assets::addAssets(...));
+// Koordinatenfelder
+number|pos_lat|Latitude||
+number|pos_lng|Longitude||
 
-$yform = new rex_yform();
-$yform->setObjectparams('form_name', 'table-rex_geotest');
-$yform->setObjectparams('form_action',rex_getUrl('REX_ARTICLE_ID'));
-$yform->setObjectparams('form_ytemplate', 'bootstrap');
-$yform->setObjectparams('form_showformafterupdate', 0);
-$yform->setObjectparams('real_field_names', true);
-
-$yform->setValueField('text', ['street','Straße','','0']);
-$yform->setValueField('text', ['postalcode','PLZ','','0']);
-$yform->setValueField('text', ['city','Ort','','0']);
-$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
-$yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
-
-echo $yform->getForm();
+// Geo-Feld mit Standardeinstellungen
+osm_geocode|geo_position|Position|pos_lat,pos_lng
 ```
 
-Die Koordinaten können entweder in den Einzelfeldern (`lat`, `lng`) oder im `osm_geocode`-Feld (`osm`) gespeichert
-werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank speichern" festgelegt. Da im `osm_geocode`-Feld per Default keine Daten abgelegt werden, sondern in den Einzelfeldern, sollte wie im Beispiel 1 gezeigt das Feld gar nicht erst in der Datenbank angelegt werden.
-
-*Beispiel 1: Koordinaten als Einzelwerte `lat` bzw. `lng` speichern*
+### Geo-Feld mit Adressverknüpfung
 
 ```php
-$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
-$yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','1']);
+// Adressfelder
+text|strasse|Straße||
+text|plz|PLZ||
+text|ort|Ort||
+
+// Koordinatenfelder
+number|pos_lat|Latitude||
+number|pos_lng|Longitude||
+
+// Geo-Feld mit Adressverknüpfung
+osm_geocode|geo_position|Position|pos_lat,pos_lng|strasse,plz,ort
 ```
 
-*Beispiel 2: Koordinaten als Kombiwert (`lat,lng`) in `osm` speichern*
+### Geo-Feld mit angepasster Initialisierung
 
 ```php
-$yform->setValueField('number', ['lat','LAT','10','7','','1','input:text']);
-$yform->setValueField('number', ['lng','LNG','11','8','','1','input:text']);
-$yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
-```
+// Koordinatenfelder
+number|pos_lat|Latitude||
+number|pos_lng|Longitude||
 
-### Batch-Geokodierung in YForm
-
-Die Batch-Geokodierung wird im YForm Reiter "Geo OSM" eingestellt:
-
-1. Tabelle mit Geocode-Feld auswählen
-2. Optional: Geoapify-API-Key eintragen
-3. Geocodierung starten
-4. Verarbeitung erfolgt in 200er-Schritten
-
-## API-Nutzung
-
-### Dienst: Nominatim
-
-*-* Standardmäßig wird Nominatim verwendet
-
-* Kostenlos, aber mit Nutzungsbeschränkungen
-* Rate Limit beachten
-
-### Dienst: Geoapify
-
-* Optional für erweiterte Funktionen
-* API-Key erforderlich
-* Höhere Limits möglich
-* Bessere Genauigkeit
-
-## Geopicker für Module / Add-ons Beispiel
-
-In diesem Fall werden die Koordinaten in einem Feld gespeichert. Das Feld muss die CSS-Klasse `rex-coords` besitzen.
-
-```html
-<div class="form-group">
-    <label>Location 1</label>
-    <input type="text" 
-           name="REX_INPUT_VALUE[1]" 
-           value="REX_VALUE[1]" 
-           class="form-control rex-coords"
-           readonly>
-</div>
-
-<div class="form-group">
-    <label>Location 2</label>
-    <input type="text" 
-           name="REX_INPUT_VALUE[2]" 
-           value="REX_VALUE[2]" 
-           class="form-control rex-coords"
-           readonly>
-</div>
+// Geo-Feld mit JSON-Formatierung
+osm_geocode|geo_position|Position|pos_lat,pos_lng||{"style": "height: 400px", "data-init-lat": "52.5200", "data-init-lng": "13.4050", "data-init-zoom": "12"}
 ```
 
 ## Lizenz
 
-MIT-Lizenz, siehe [LICENSE](LICENSE)
+MIT Lizenz, siehe [LICENSE.md](LICENSE.md)
 
-## Autoren
+## Autor
 
 **Friends Of REDAXO**
 
-* <http://www.redaxo.org>
-* <https://github.com/FriendsOfREDAXO>
-
-**Project Lead**
-
-[Alexander Walther](https://github.com/alxndr-w)
-
-**Weitere Credits**
-
-* Polarpixel – Peter Bickel (Testing / Ideen)
-* Wolfgang Bund – Massencodierung
-* Leaflet
-* OpenStreetMap
-* Mapbox
-* Geoapify
+* https://www.redaxo.org
+* https://github.com/FriendsOfREDAXO
