@@ -1,43 +1,51 @@
+/* REDAXO Standard-Variablen verwenden und erweitern */
 :root {
-   --rex-geo-background: #fff;
-   --rex-geo-background-hover: #f8f9fa;
-   --rex-geo-text: #212529;
-   --rex-geo-border: #dee2e6;
-   --rex-geo-input-bg: #fff;
-   --rex-geo-input-text: #212529;
-   --rex-geo-input-border: #dee2e6;
-   --rex-geo-shadow: rgba(0,0,0,0.1);
-   --rex-geo-primary: #2196F3;
-   --rex-geo-primary-hover: #1e87db;
-   --rex-geo-success: #4CAF50;
-   --rex-geo-success-hover: #45a049;
+    /* Bestehende REDAXO-Variablen */
+    --rex-background-color: #fff;
+    --rex-background-dark: #f3f6fb;
+    --rex-text-color: #212529;
+    --rex-link-color: #2196F3;
+    --rex-link-color-hover: #1e87db;
+    --rex-primary-color: #2196F3;
+    --rex-border-color: #ced4da;
+
+    /* Neue Variablen für Geo OSM */
+    --rex-geo-background: var(--rex-background-color);
+    --rex-geo-text: var(--rex-text-color);
+    --rex-geo-border: var(--rex-border-color);
+    --rex-geo-input-bg: var(--rex-background-color);
+    --rex-geo-input-text: var(--rex-text-color);
+    --rex-geo-input-border: var(--rex-border-color);
+    --rex-geo-shadow: rgba(0,0,0,0.1);
+    --rex-geo-primary: var(--rex-primary-color);
+    --rex-geo-primary-hover: var(--rex-link-color-hover);
+    --rex-geo-modal-backdrop: rgba(0,0,0,0.5);
 }
 
 /* Dark theme colors */
 :root[data-theme="dark"], 
-.rex-has-theme.rex-theme-dark {
-   --rex-geo-background: #32373c;
-   --rex-geo-background-hover: #3c4146;
-   --rex-geo-text: #fff;
-   --rex-geo-border: #404448;
-   --rex-geo-input-bg: #282c30;
-   --rex-geo-input-text: #fff;
-   --rex-geo-input-border: #404448;
-   --rex-geo-shadow: rgba(0,0,0,0.3);
+.rex-has-theme.rex-theme-dark,
+.rex-theme--dark {
+    /* REDAXO Dark Theme Variablen */
+    --rex-background-color: #32373c;
+    --rex-background-dark: #202428;
+    --rex-text-color: #f2f2f2;
+    --rex-link-color: #3f9ce7;
+    --rex-link-color-hover: #1b7dc5;
+    --rex-border-color: #404448;
+
+    /* Geo OSM Dark Theme */
+    --rex-geo-background: var(--rex-background-color);
+    --rex-geo-text: var(--rex-text-color);
+    --rex-geo-border: var(--rex-border-color);
+    --rex-geo-input-bg: var(--rex-background-dark);
+    --rex-geo-input-text: var(--rex-text-color);
+    --rex-geo-input-border: var(--rex-border-color);
+    --rex-geo-shadow: rgba(0,0,0,0.3);
+    --rex-geo-modal-backdrop: rgba(0,0,0,0.7);
 }
 
-@media (prefers-color-scheme: dark) {
-   :root {
-       --rex-geo-background: #32373c;
-       --rex-geo-background-hover: #3c4146;
-       --rex-geo-text: #fff;
-       --rex-geo-border: #404448;
-       --rex-geo-input-bg: #282c30;
-       --rex-geo-input-text: #fff;
-       --rex-geo-input-border: #404448;
-       --rex-geo-shadow: rgba(0,0,0,0.3);
-   }
-}
+/* Modal */
 .rex-geo-search-modal {
     display: none;
     position: fixed;
@@ -46,7 +54,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: var(--rex-geo-modal-backdrop);
 }
 
 .rex-geo-search-content {
@@ -54,7 +62,7 @@
     color: var(--rex-geo-text);
     margin: 10% auto;
     padding: 30px;
-    border-radius: 8px;
+    border-radius: 4px;
     width: 90%;
     max-width: 800px;
     position: relative;
@@ -70,6 +78,7 @@
     cursor: pointer;
     opacity: 0.7;
     color: var(--rex-geo-text);
+    transition: opacity 0.2s ease;
 }
 
 .rex-geo-search-close:hover {
@@ -83,19 +92,20 @@
 
 .rex-geo-search-input {
     width: 100%;
-    font-size: 24px !important;
-    padding: 15px !important;
-    border: 2px solid var(--rex-geo-input-border) !important;
-    border-radius: 8px !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+    border: 1px solid var(--rex-geo-input-border) !important;
+    border-radius: 4px !important;
     height: auto !important;
     background-color: var(--rex-geo-input-bg) !important;
     color: var(--rex-geo-input-text) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .rex-geo-search-input:focus {
     border-color: var(--rex-geo-primary) !important;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.2) !important;
 }
 
 .search-results {
@@ -109,40 +119,15 @@
     padding: 12px 15px;
     cursor: pointer;
     border-bottom: 1px solid var(--rex-geo-border);
-    transition: background-color 0.2s ease;
-    font-size: 16px;
     color: var(--rex-geo-text);
+    transition: background-color 0.2s ease;
 }
 
 .search-result:hover {
-    background-color: var(--rex-geo-background-hover);
+    background-color: var(--rex-background-dark);
 }
 
-.btn.browser-location {
-    background-color: var(--rex-geo-success);
-    border-color: var(--rex-geo-success);
-    color: #fff;
-}
-
-.btn.browser-location:hover {
-    background-color: var(--rex-geo-success-hover);
-    border-color: var(--rex-geo-success-hover);
-}
-
-.btn.search, 
-.btn.set {
-    background-color: var(--rex-geo-primary);
-    border-color: var(--rex-geo-primary);
-    color: #fff;
-}
-
-.btn.search:hover,
-.btn.set:hover {
-    background-color: var(--rex-geo-primary-hover);
-    border-color: var(--rex-geo-primary-hover);
-}
-
-
+/* Koordinaten Modal */
 .rex-coord-modal {
     display: none;
     position: fixed;
@@ -151,22 +136,23 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: var(--rex-geo-modal-backdrop);
 }
 
 .rex-coord-content {
-    background-color: #fff;
+    background-color: var(--rex-geo-background);
+    color: var(--rex-geo-text);
     margin: 5% auto;
     width: 90%;
     max-width: 900px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px var(--rex-geo-shadow);
     overflow: hidden;
 }
 
 .rex-coord-header {
     padding: 15px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rex-geo-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -175,12 +161,15 @@
 .rex-coord-header h3 {
     margin: 0;
     font-size: 18px;
+    color: var(--rex-geo-text);
 }
 
 .rex-coord-close {
     font-size: 24px;
     cursor: pointer;
     opacity: 0.7;
+    color: var(--rex-geo-text);
+    transition: opacity 0.2s ease;
 }
 
 .rex-coord-close:hover {
@@ -196,8 +185,17 @@
     width: 100%;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--rex-geo-input-border);
     border-radius: 4px;
+    background-color: var(--rex-geo-input-bg);
+    color: var(--rex-geo-input-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#rex-coord-search-input:focus {
+    border-color: var(--rex-geo-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.2);
 }
 
 #rex-coord-search-results {
@@ -205,65 +203,61 @@
     top: 100%;
     left: 20px;
     right: 20px;
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--rex-geo-background);
+    border: 1px solid var(--rex-geo-border);
     border-radius: 4px;
     max-height: 200px;
     overflow-y: auto;
     z-index: 2000;
 }
 
-.search-result {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-.search-result:hover {
-    background-color: #f5f5f5;
-}
-
 #rex-coord-map {
     height: 400px;
     width: 100%;
+    background-color: var(--rex-geo-background);
 }
 
 .rex-coord-footer {
     padding: 15px 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--rex-geo-border);
     text-align: right;
+    background-color: var(--rex-geo-background);
 }
 
 .rex-coord-footer button {
     margin-left: 10px;
 }
 
-/* Dark theme support */
-body.rex-has-theme.rex-theme-dark .rex-coord-content {
-    background-color: #32373c;
+/* Button Styles */
+.btn.browser-location {
+    background-color: var(--rex-geo-primary);
+    border-color: var(--rex-geo-primary);
     color: #fff;
 }
 
-body.rex-has-theme.rex-theme-dark .rex-coord-header,
-body.rex-has-theme.rex-theme-dark .rex-coord-footer {
-    border-color: #404448;
+.btn.browser-location:hover {
+    background-color: var(--rex-geo-primary-hover);
+    border-color: var(--rex-geo-primary-hover);
 }
 
-body.rex-has-theme.rex-theme-dark #rex-coord-search-input {
-    background-color: #282c30;
-    border-color: #404448;
+.btn.search, 
+.btn.set {
+    background-color: var(--rex-geo-primary);
+    border-color: var(--rex-geo-primary);
     color: #fff;
 }
 
-body.rex-has-theme.rex-theme-dark #rex-coord-search-results {
-    background-color: #32373c;
-    border-color: #404448;
+.btn.search:hover,
+.btn.set:hover {
+    background-color: var(--rex-geo-primary-hover);
+    border-color: var(--rex-geo-primary-hover);
 }
 
-body.rex-has-theme.rex-theme-dark .search-result {
-    border-color: #404448;
+/* Leaflet Map Dark Mode Anpassungen */
+.rex-has-theme.rex-theme-dark .leaflet-tile-pane {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
 
-body.rex-has-theme.rex-theme-dark .search-result:hover {
-    background-color: #3c4146;
+.rex-has-theme.rex-theme-dark .leaflet-container {
+    background: #303030;
 }
