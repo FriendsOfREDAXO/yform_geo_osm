@@ -12,7 +12,7 @@ class CoordPicker {
                 <div class="rex-coord-content">
                     <div class="rex-coord-header">
                         <h3>Select Location</h3>
-                        <span class="rex-coord-close">&times;</span>
+                        <span class="rex-coord-close">×</span>
                     </div>
                     <div class="rex-coord-search">
                         <input type="text" id="rex-coord-search-input" 
@@ -54,8 +54,8 @@ class CoordPicker {
         this.modal.style.display = 'block';
         
         const coords = this.parseCoords(input.value);
-        const lat = coords ? coords.lat : 51.1657;
-        const lng = coords ? coords.lng : 10.4515;
+        const lat = coords ? coords.lat : null;
+        const lng = coords ? coords.lng : null;
 
         this.initMap(lat, lng);
     }
@@ -65,8 +65,20 @@ class CoordPicker {
             this.map.remove();
         }
 
-        this.map = L.map('rex-coord-map').setView([lat, lng], 16);
-        
+        // Standardmäßig die Karte auf Frankfurt setzen und ganze Welt anzeigen
+        let initialLat = 50.1109221; //ungefähre Mitte von Frankfurt
+        let initialLng = 8.6821267;
+        let initialZoom = 2; // Zoomstufe um die ganze Welt anzuzeigen
+
+        // Wenn valide Koordinaten übergeben werden, diese anwenden
+        if(typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+            initialLat = lat;
+            initialLng = lng;
+            initialZoom = 14; // Zoomstufe für eine bessere Detailansicht
+        }
+
+        this.map = L.map('rex-coord-map').setView([initialLat, initialLng], initialZoom);
+
         if (this.mapboxToken) {
             L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + this.mapboxToken, {
                 id: 'mapbox.streets',
@@ -78,9 +90,10 @@ class CoordPicker {
             }).addTo(this.map);
         }
 
-        this.marker = L.marker([lat, lng], {
+        this.marker = L.marker([initialLat, initialLng], {
             draggable: true
         }).addTo(this.map);
+
     }
 
     async performSearch(searchText) {
