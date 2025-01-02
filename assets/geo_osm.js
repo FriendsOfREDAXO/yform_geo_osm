@@ -7,17 +7,17 @@ function rex_geo_osm_get_address(addressfields) {
     return out.join(",");
 }
 
-var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
+var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options = {}) {
     
-    // Standardwerte für Frankfurt und Welt-Zoom
-    let initialLat = 50.1109221; //ungefähre Mitte von Frankfurt
-    let initialLng = 8.6821267;
-    let initialZoom = 2;       // Zoomstufe für die ganze Welt
+    // Standardwerte für Frankfurt und Welt-Zoom, können durch options überschrieben werden
+    let initialLat = options.initialLat || 50.1109221;
+    let initialLng = options.initialLng || 8.6821267;
+    let initialZoom = options.initialZoom || 2;
 
-    // Aktuelle Werte aus den Feldern holen, wenn vorhanden, sonst die Standardwerte
-    var current_lat = $(geofields.lat).val() || initialLat;
-    var current_lng = $(geofields.lng).val() || initialLng;
-    let defaultZoom = $(geofields.lat).val() && $(geofields.lng).val() ? 14 : initialZoom;
+    // Aktuelle Werte aus den Feldern holen
+    var current_lat = $(geofields.lat).val();
+    var current_lng = $(geofields.lng).val();
+    let defaultZoom = current_lat && current_lng ? 14 : initialZoom;
    
     L.Map.addInitHook(function () {
         this.getContainer()._leaflet_map = this;
@@ -26,17 +26,19 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     // Map initialization
     var map;
     let mapOptions = {
-        center: [current_lat, current_lng],
+        center: current_lat && current_lng ? [current_lat, current_lng] : [initialLat, initialLng],
         zoom: defaultZoom,
         gestureHandling: true,
         duration: 500,
+        ...options.mapOptions // Zusätzliche Leaflet-Optionen aus den options
     }
+    
     if(mapbox_token=='') {
         let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
         mapOptions.layers = [streets];
-        map = L.map('map-'+id,mapOptions);
+        map = L.map('map-'+id, mapOptions);
     } else {
         var mapboxAttribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -58,19 +60,37 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         L.control.layers(baseMaps).addTo(map);
     }
 
-    var marker = L.marker([current_lat, current_lng], {
-        draggable: true
-    }).on('dragend', function(ev) {
-        var newPos = ev.target.getLatLng();
-        $(geofields.lat).val(newPos.lat);
-        $(geofields.lng).val(newPos.lng);
-    }).addTo(map);
+    var marker = null;
+    var markerOptions = {
+        draggable: true,
+        ...options.markerOptions
+    };
+
+    // Marker nur erstellen wenn Koordinaten vorhanden sind
+    if(current_lat && current_lng) {
+        createMarker(current_lat, current_lng);
+    }
+
+    function createMarker(lat, lng) {
+        if(marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], markerOptions)
+                .on('dragend', function(ev) {
+                    var newPos = ev.target.getLatLng();
+                    $(geofields.lat).val(newPos.lat);
+                    $(geofields.lng).val(newPos.lng);
+                }).addTo(map);
+        }
+    }
 
     $(geofields.lat+','+geofields.lng).on('keyup', function() {
         var lat = $(geofields.lat).val();
         var lng = $(geofields.lng).val();
-        map.setView([lat, lng], defaultZoom);
-        marker.setLatLng([lat, lng]);
+        if(lat && lng) {
+            createMarker(lat, lng);
+            map.setView([lat, lng], defaultZoom);
+        }
     });
 
     // Show/hide search modal
@@ -133,8 +153,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     function selectLocation(location) {
         $(geofields.lat).val(location.lat);
         $(geofields.lng).val(location.lon);
+        createMarker(location.lat, location.lon);
         map.setView([location.lat, location.lon], 16);
-        marker.setLatLng([location.lat, location.lon]);
         $('#rex-geo-search-modal-'+id).hide();
         $('#rex-geo-search-input-'+id).val('');
         $('#rex-geo-search-results-'+id).empty();
@@ -148,8 +168,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 var lng = position.coords.longitude;
                 $(geofields.lat).val(lat);
                 $(geofields.lng).val(lng);
+                createMarker(lat, lng);
                 map.setView([lat, lng], 16);
-                marker.setLatLng([lat, lng]);
             }, function(error) {
                 alert("Geolocation failed: " + error.message);
             });
@@ -161,8 +181,9 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     // Recenter the map to the curent marker-position
     $('#center-geo-'+id).on('click', function(e) {
         e.preventDefault();
-        map.setView(marker.getLatLng(), 16);
-
+        if(marker) {
+            map.setView(marker.getLatLng(), 16);
+        }
     });        
 
     // Original address geocoding
@@ -188,8 +209,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 }
                 $(geofields.lat).val(json[0].lat);
                 $(geofields.lng).val(json[0].lon);
+                createMarker(json[0].lat, json[0].lon);
                 map.setView([json[0].lat, json[0].lon], 16);
-                marker.setLatLng([json[0].lat, json[0].lon]);
             } else {
                 console.log('An error occurred.');
             }
@@ -197,4 +218,21 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(street+' '+city+' '+postalcode)+'&format=json&polygon=0&addressdetails=0&limit=1');
         xhr.send();
     });
+
+    // Public methods/properties
+    return {
+        map: map,
+        marker: marker,
+        setView: function(lat, lng, zoom) {
+            createMarker(lat, lng);
+            map.setView([lat, lng], zoom);
+        },
+        getMap: function() {
+            return map;
+        },
+        getMarker: function() {
+            return marker;
+        },
+        createMarker: createMarker
+    };
 }
