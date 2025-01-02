@@ -5,3 +5,24 @@ yform_geo_osm_search_address = Adresse suchen
 yform_geo_osm_get_location = Meinen Standort übernehmen
 yform_geo_osm_search = Suchen
 yform_geo_osm_search_placeholder = Adresse eingeben...
+
+# Fehlermeldungen und Validierung
+yform_geo_osm_error_coordinates = Bitte genau zwei Felder für Breiten- und Längengrade (lat, lng) angeben.
+yform_geo_osm_error_unknown_field = Koordinaten-Feld unbekannt: «%s»
+yform_geo_osm_error_address_field = Adress-Feld unbekannt: «%s»
+yform_geo_osm_error_format = Ungültige Formatierung. Bitte geben Sie ein gültiges JSON-Objekt ein.
+yform_geo_osm_error_no_db_conflict = "%s" kollidiert mit der Feldkonfiguration von «%s»; Beide Koordinatenfelder («%s») müssen speicherbar sein, wenn dieses Feld nicht speicherbar ist
+
+# Feldbezeichnungen
+yform_geo_osm_label_name = Name
+yform_geo_osm_label_label = Bezeichnung
+yform_geo_osm_label_coord_fields = Koordinaten-Felder
+yform_geo_osm_label_address_fields = Adressen-Felder
+yform_geo_osm_label_format = Format
+yform_geo_osm_label_mapbox_token = Mapbox-Token
+
+# Hilfetexte
+yform_geo_osm_notice_coord_fields = Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»
+yform_geo_osm_notice_address_fields = Namen der Felder mit Adressen-Elementen zur Positionsfindung; Bsp.: «strasse,plz,ort»
+yform_geo_osm_notice_format = JSON-Objekt für Kartenformatierung und initiale Einstellungen. Beispiel: {"class":"wide","data-init-lat":"48.8566","data-init-lng":"2.3522","data-init-zoom":"10"}
+yform_geo_osm_notice_mapbox_token = (optional)
