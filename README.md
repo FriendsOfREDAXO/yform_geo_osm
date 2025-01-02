@@ -60,6 +60,7 @@ if ($coords) {
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
 
 ```php
+use FriendsOfRedaxo\YFormGeoOsm\Search;
 // Geocoder für Massenverarbeitung initialisieren
 $geocoder = Search::forBulkGeocoding(
     'rex_my_addresses',           // Tabellenname
@@ -85,6 +86,7 @@ printf(
 > Hinweis: dies setzt voraus, dass es zwei getrennte Felder für Längen- und Breitengrade gibt. Mit dem ebenfalls möglichen kombinierten Feld ist diese Funktion derzeit nicht möglich.
 
 ```php
+use FriendsOfRedaxo\YFormGeoOsm\Search;
 // Geocoder für PLZ-Suche initialisieren
 $geo = new Search(
     [
