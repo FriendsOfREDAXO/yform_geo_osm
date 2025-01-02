@@ -23,22 +23,27 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
         this.getContainer()._leaflet_map = this;
     });
 
-    // Map initialization
-    var map;
-    let mapOptions = {
+    // Basis Map-Optionen
+    let defaultMapOptions = {
         center: current_lat && current_lng ? [current_lat, current_lng] : [initialLat, initialLng],
         zoom: defaultZoom,
         gestureHandling: true,
-        duration: 500,
-        ...options.mapOptions // Zusätzliche Leaflet-Optionen aus den options
-    }
+        duration: 500
+    };
+
+    // Map-Optionen mit benutzerdefinierten Optionen zusammenführen
+    let mapOptions = {
+        ...defaultMapOptions,
+        ...(options.mapOptions || {})
+    };
     
+    // Map initialization
+    var map;
     if(mapbox_token=='') {
         let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
             attribution: 'Map data © <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
-        mapOptions.layers = [streets];
-        map = L.map('map-'+id, mapOptions);
+        map = L.map('map-'+id, mapOptions).addLayer(streets);
     } else {
         var mapboxAttribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -49,8 +54,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
             streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
             {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-        mapOptions.layers = [streets, streets_sattelite];
-        map = L.map('map-'+id, mapOptions);
+        map = L.map('map-'+id, mapOptions).addLayer(streets);
 
         var baseMaps = {
             "Map": streets,
@@ -61,9 +65,14 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token, options =
     }
 
     var marker = null;
+    var defaultMarkerOptions = {
+        draggable: true
+    };
+    
+    // Marker-Optionen mit benutzerdefinierten Optionen zusammenführen
     var markerOptions = {
-        draggable: true,
-        ...options.markerOptions
+        ...defaultMarkerOptions,
+        ...(options.markerOptions || {})
     };
 
     // Marker nur erstellen wenn Koordinaten vorhanden sind
