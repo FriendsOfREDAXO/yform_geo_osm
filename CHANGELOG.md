@@ -3,7 +3,6 @@
 ## Version 2.0.0 //
 
 * Umstellung auf FriendsOfREDAXO-Namespace. @alxndr-w
-* Geopicker für Module oder AddOns @skerbis
 * Sprachdateien aktualisiert  @skerbis
 * Von rexstan gemeldete Code-Verbesserungen umgesetzt. @alxndr-w @christophboecker
 * Konfiguration per JSON möglich, ersetzt das Height-Feld  @skerbis
@@ -18,15 +17,17 @@
   * Marker wird nicht mehr initial angezeigt
   * Erscheint erst bei Positionsauswahl
   * Verbesserte Transitionen
-
-## Version 1.4.0 // 27.12.2024
-
-* Neue Funktionen für einzelne Adressabfragen
-* Verbesserte `geo_search`-Klasse mit drei Betriebsmodi:
+* Neue Funktionen für einzelne Adressabfragen  @skerbis
+* Verbesserte `geo_search`-Klasse mit drei Betriebsmodi:  @skerbis
   * Einzelabfrage
   * Batch-Geokodierung
   * PLZ-Umkreissuche
-* Erweiterte Dokumentation und Beispiele.
+* Erweiterte Dokumentation und Beispiele.  @skerbis
+* Karten im YForm-Value optimieren @christophboecker
+* Kleinere Optimierungen im YForm-Value und seinem YTemplate @christophboecker
+* RexStan eingesetzt, Value mit Validierung der Feldkonfiguration @christophboecker
+* no_db-Option und zugehörige Doku  @christophboecker
+* DB-Feldtyp varchar statt text / Speicherverhalten geändert  @christophboecker
 
 ## Version 1.3.0 // 27.12.2024
 
