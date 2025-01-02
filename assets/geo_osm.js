@@ -8,10 +8,17 @@ function rex_geo_osm_get_address(addressfields) {
 }
 
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
-    var current_lat = $(geofields.lat).val() || 51.1657;
-    var current_lng = $(geofields.lng).val() || 10.4515;
-    let defaultZoom = 16;
+    
+    // Standardwerte für Frankfurt und Welt-Zoom
+    let initialLat = 50.1109221; //ungefähre Mitte von Frankfurt
+    let initialLng = 8.6821267;
+    let initialZoom = 2;       // Zoomstufe für die ganze Welt
 
+    // Aktuelle Werte aus den Feldern holen, wenn vorhanden, sonst die Standardwerte
+    var current_lat = $(geofields.lat).val() || initialLat;
+    var current_lng = $(geofields.lng).val() || initialLng;
+    let defaultZoom = $(geofields.lat).val() && $(geofields.lng).val() ? 14 : initialZoom;
+   
     L.Map.addInitHook(function () {
         this.getContainer()._leaflet_map = this;
     });
@@ -26,12 +33,12 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     }
     if(mapbox_token=='') {
         let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            attribution: 'Map data © <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
         mapOptions.layers = [streets];
         map = L.map('map-'+id,mapOptions);
     } else {
-        var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        var mapboxAttribution = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
             'Imagery © <a href="http://mapbox.com">Mapbox</a>';
 
@@ -126,7 +133,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     function selectLocation(location) {
         $(geofields.lat).val(location.lat);
         $(geofields.lng).val(location.lon);
-        map.setView([location.lat, location.lon], defaultZoom);
+        map.setView([location.lat, location.lon], 16);
         marker.setLatLng([location.lat, location.lon]);
         $('#rex-geo-search-modal-'+id).hide();
         $('#rex-geo-search-input-'+id).val('');
@@ -141,7 +148,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 var lng = position.coords.longitude;
                 $(geofields.lat).val(lat);
                 $(geofields.lng).val(lng);
-                map.setView([lat, lng], defaultZoom);
+                map.setView([lat, lng], 16);
                 marker.setLatLng([lat, lng]);
             }, function(error) {
                 alert("Geolocation failed: " + error.message);
@@ -154,7 +161,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     // Recenter the map to the curent marker-position
     $('#center-geo-'+id).on('click', function(e) {
         e.preventDefault();
-        map.setView(marker.getLatLng(), defaultZoom);
+        map.setView(marker.getLatLng(), 16);
 
     });        
 
@@ -181,7 +188,7 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 }
                 $(geofields.lat).val(json[0].lat);
                 $(geofields.lng).val(json[0].lon);
-                map.setView([json[0].lat, json[0].lon], defaultZoom);
+                map.setView([json[0].lat, json[0].lon], 16);
                 marker.setLatLng([json[0].lat, json[0].lon]);
             } else {
                 console.log('An error occurred.');
