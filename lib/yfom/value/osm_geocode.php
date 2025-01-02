@@ -163,7 +163,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 ['customfunction' => ['name' => 'no_db', 'function' => $this->validateNoDb(...)]],
                 ['customfunction' => ['name' => ['height','format'], 'function' => $this->validateLayout(...)]],
             ],
-            'description' => 'Openstreetmap Positionierung',
+            'description' => '🧩 yform_geo_osm: OpenStreetMap-Karte und Geoocodierung',
             'dbtype' => 'varchar(191)',
             'formbuilder' => false,
             'multi_edit' => false,
