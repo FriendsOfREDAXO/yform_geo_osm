@@ -71,19 +71,20 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 return;
             }
 
-            data.forEach(function(result) {
-                $('<div class="rex-geo-search-result">')
-                    .text(result.display_name)
-                    .on('click', function() {
-                        var lat = parseFloat(result.lat);
-                        var lng = parseFloat(result.lon);
-                        createMap(lat, lng);
-                        savePosition({lat: lat, lng: lng});
-                        $searchResults.removeClass('active');
-                        $searchInput.val(result.display_name);
-                    })
-                    .appendTo($searchResults);
-            });
+            // Im YForm Geocoder:
+data.forEach(function(result) {
+    $('<div class="rex-geo-search-result">')
+        .text(result.display_name)
+        .on('click', function() {
+            var lat = parseFloat(result.lat);
+            var lng = parseFloat(result.lon);
+            createMap(lat, lng);
+            savePosition({lat: lat, lng: lng});
+            $searchInput.val(result.display_name);
+            $searchResults.removeClass('active').empty(); // Leeren und ausblenden
+        })
+        .appendTo($searchResults);
+});
             
             $searchResults.addClass('active');
         });
