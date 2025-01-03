@@ -1,18 +1,29 @@
 class CoordPicker {
-    constructor(options = {}) {
-        this.mapboxToken = options.mapboxToken || '';
+    constructor() {
+        this.modal = null;
+        this.searchInput = null;
+        this.searchResults = null;
+        this.map = null;
+        this.marker = null;
+        this.currentInput = null;
         this.initModal();
         this.initEvents();
-        this.currentInput = null;
     }
 
     initModal() {
+        if (document.getElementById('rex-coord-modal')) {
+            this.modal = document.getElementById('rex-coord-modal');
+            this.searchInput = document.getElementById('rex-coord-search-input');
+            this.searchResults = document.getElementById('rex-coord-search-results');
+            return;
+        }
+
         const modal = `
             <div id="rex-coord-modal" class="rex-coord-modal">
                 <div class="rex-coord-content">
                     <div class="rex-coord-header">
                         <h3>Select Location</h3>
-                        <span class="rex-coord-close">&times;</span>
+                        <span class="rex-coord-close">×</span>
                     </div>
                     <div class="rex-coord-search">
                         <input type="text" id="rex-coord-search-input" 
@@ -33,15 +44,31 @@ class CoordPicker {
         this.searchResults = document.getElementById('rex-coord-search-results');
     }
 
+    destroyModal() {
+        if (this.modal) {
+            this.modal.remove();
+        }
+        this.modal = null;
+        this.searchInput = null;
+        this.searchResults = null;
+        this.map = null;
+        this.marker = null;
+        this.currentInput = null;
+    }
+
     initEvents() {
+        if (!this.modal) return;
+        const self = this;
         document.querySelectorAll('.rex-coords').forEach(input => {
-            input.addEventListener('click', () => this.openPicker(input));
+            input.addEventListener('click', function() {
+                self.openPicker(this);
+            });
         });
 
         document.querySelector('.rex-coord-close').addEventListener('click', () => this.closeModal());
         document.getElementById('rex-coord-cancel').addEventListener('click', () => this.closeModal());
         document.getElementById('rex-coord-apply').addEventListener('click', () => this.applyCoords());
-        
+
         let searchTimeout;
         this.searchInput.addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
@@ -49,39 +76,38 @@ class CoordPicker {
         });
     }
 
-    openPicker(input) {
-        this.currentInput = input;
+   openPicker(input) {
+       this.currentInput = input;
         this.modal.style.display = 'block';
-        
+
         const coords = this.parseCoords(input.value);
-        const lat = coords ? coords.lat : 51.1657;
-        const lng = coords ? coords.lng : 10.4515;
+        let lat, lng;
 
-        this.initMap(lat, lng);
-    }
-
-    initMap(lat, lng) {
-        if (this.map) {
-            this.map.remove();
-        }
-
-        this.map = L.map('rex-coord-map').setView([lat, lng], 16);
-        
-        if (this.mapboxToken) {
-            L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + this.mapboxToken, {
-                id: 'mapbox.streets',
-                attribution: '© Mapbox © OpenStreetMap'
-            }).addTo(this.map);
+        if (coords) {
+            lat = coords.lat;
+            lng = coords.lng;
         } else {
-            L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(this.map);
+            lat = 0;
+            lng = 0;
+        }
+       this.initMap(lat, lng, !coords); // Übergebe 'initialWorldView' Flag
+    }
+
+   initMap(lat, lng, initialWorldView = false) {
+       if (this.map) {
+          this.map.remove();
         }
 
-        this.marker = L.marker([lat, lng], {
+        this.map = L.map('rex-coord-map').setView([lat, lng], initialWorldView ? 2 : 16); // Zoom-Level anpassen
+        
+       L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+       }).addTo(this.map);
+
+       this.marker = L.marker([lat, lng], {
             draggable: true
-        }).addTo(this.map);
-    }
+       }).addTo(this.map);
+   }
 
     async performSearch(searchText) {
         if (!searchText.trim()) {
@@ -134,8 +160,23 @@ class CoordPicker {
         this.searchInput.value = '';
     }
 }
+
+let coordPickerInstance;
+
 $(document).on('rex:ready', function() {
-    new CoordPicker({
-        mapboxToken: '' // Optional Mapbox token
+    if (coordPickerInstance) {
+        coordPickerInstance.destroyModal();
+    }
+    coordPickerInstance = new CoordPicker();
+
+    const observer = new MutationObserver(() => {
+        if (coordPickerInstance) {
+            coordPickerInstance.initEvents();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 });
