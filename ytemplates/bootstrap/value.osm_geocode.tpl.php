@@ -71,27 +71,28 @@ if ('' === $mapclass) {
 
 $fragment->setVar('buttons', $items, false);
 $buttonHTML = $fragment->parse('core/buttons/button_group.php');
-
 ?>
 <div class="<?= $class_group ?>" id="<?= $this->getHTMLId('osm') ?>">
-    <label class="<?= $class_label ?>"><?= $this->getElement('label') ?></label>
+    <div class="yform-geocoding-wrapper">
+        <label class="<?= $class_label ?>"><?= $this->getElement('label') ?></label>
 
-    <div class="rex-geo-search-wrapper">
-        <input type="text" 
-               id="rex-geo-search-input-<?= $this->getId()?>" 
-               class="form-control rex-geo-search-input"
-               placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>" 
-               autocomplete="off">
-        <div id="rex-geo-search-results-<?= $this->getId()?>" 
-             class="rex-geo-search-results"></div>
-    </div>
+        <div class="rex-geo-search-wrapper">
+            <input type="text" 
+                id="rex-geo-search-input-<?= $this->getId()?>" 
+                class="form-control rex-geo-search-input"
+                placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>" 
+                autocomplete="off">
+            <div id="rex-geo-search-results-<?= $this->getId()?>" 
+                class="rex-geo-search-results"></div>
+        </div>
 
-    <?= $buttonHTML ?>
+        <?= $buttonHTML ?>
 
-    <div <?= rex_string::buildAttributes($mapAttributes) ?>>
-        <div class="rex-geo-overlay" id="rex-geo-overlay-<?= $this->getId()?>">
-            <div class="rex-geo-overlay-content">
-                <?= rex_i18n::msg('yform_geo_osm_no_data') ?>
+        <div <?= rex_string::buildAttributes($mapAttributes) ?>>
+            <div class="rex-geo-overlay" id="rex-geo-overlay-<?= $this->getId()?>">
+                <div class="rex-geo-overlay-content">
+                    <?= rex_i18n::msg('yform_geo_osm_no_data') ?>
+                </div>
             </div>
         </div>
     </div>
