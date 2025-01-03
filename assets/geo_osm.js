@@ -1,193 +1,176 @@
-function rex_geo_osm_get_address(addressfields) {
-    var out = [];
-    for(var i=0; i<addressfields.length; i++) {
-        if($(addressfields[i]).val()!='')
-            out.push($(addressfields[i]).val());
-    }
-    return out.join(",");
-}
-
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
-    var current_lat = $(geofields.lat).val() || 51.1657;
-    var current_lng = $(geofields.lng).val() || 10.4515;
-    let defaultZoom = 16;
-
-    L.Map.addInitHook(function () {
-        this.getContainer()._leaflet_map = this;
-    });
-
+    var current_lat = $(geofields.lat).val();
+    var current_lng = $(geofields.lng).val();
+    var hasCoordinates = current_lat && current_lng;
+    
     // Map initialization
-    var map;
-    let mapOptions = {
-        center: [current_lat, current_lng],
-        zoom: defaultZoom,
+    var mapOptions = {
         gestureHandling: true,
-        duration: 500,
+        duration: 500
+    };
+
+    if (hasCoordinates) {
+        mapOptions.center = [current_lat, current_lng];
+        mapOptions.zoom = 16;
+    } else {
+        mapOptions.center = [30, 0];
+        mapOptions.zoom = 2;
     }
-    if(mapbox_token=='') {
-        let streets = L.tileLayer('//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+
+    var map;
+    if (mapbox_token) {
+        var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+        var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
+            {id: 'mapbox.streets', attribution: mapboxAttribution}),
+            streets_satellite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
+            {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
+
+        mapOptions.layers = [streets, streets_satellite];
+        map = L.map('map-'+id, mapOptions);
+
+        L.control.layers({
+            "Map": streets,
+            "Satellite": streets_satellite
+        }).addTo(map);
+    } else {
+        var streets = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
         mapOptions.layers = [streets];
-        map = L.map('map-'+id,mapOptions);
-    } else {
-        var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-
-        var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
-            {id: 'mapbox.streets', attribution: mapboxAttribution}),
-            streets_sattelite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
-            {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
-
-        mapOptions.layers = [streets, streets_sattelite];
         map = L.map('map-'+id, mapOptions);
-
-        var baseMaps = {
-            "Map": streets,
-            "Satellite": streets_sattelite
-        };
-
-        L.control.layers(baseMaps).addTo(map);
     }
 
-    var marker = L.marker([current_lat, current_lng], {
-        draggable: true
-    }).on('dragend', function(ev) {
-        var newPos = ev.target.getLatLng();
-        $(geofields.lat).val(newPos.lat);
-        $(geofields.lng).val(newPos.lng);
-    }).addTo(map);
-
-    $(geofields.lat+','+geofields.lng).on('keyup', function() {
-        var lat = $(geofields.lat).val();
-        var lng = $(geofields.lng).val();
-        map.setView([lat, lng], defaultZoom);
-        marker.setLatLng([lat, lng]);
-    });
-
-    // Show/hide search modal
-    $('#search-geo-'+id).on('click', function() {
-        $('#rex-geo-search-modal-'+id).show();
-        $('#rex-geo-search-input-'+id).focus();
-    });
-
-    $('.rex-geo-search-close').on('click', function() {
-        $(this).closest('.rex-geo-search-modal').hide();
-    });
-
-    // Live search
-    $('#rex-geo-search-input-'+id).on('input', function(e) {
-        e.preventDefault();
-        performSearch($(this).val());
-    });
-
-    let searchTimeout;
-
-    function performSearch(searchText) {
-        if(searchText.trim() === '') {
-            $('#rex-geo-search-results-'+id).empty();
-            return;
-        }
-
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    var json = JSON.parse(xhr.response);
-                    displaySearchResults(json);
-                } else {
-                    console.log('An error occurred.');
-                }
-            };
-            xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(searchText)+'&format=json&polygon=0&addressdetails=1&limit=5');
-            xhr.send();
-        }, 300);
-    }
-
-    function displaySearchResults(results) {
-        const resultsContainer = $('#rex-geo-search-results-'+id);
-        resultsContainer.empty();
-
-        if(results.length === 0) {
-            resultsContainer.append('<div class="search-result">No results found</div>');
-            return;
-        }
-
-        results.forEach(result => {
-            const resultDiv = $('<div class="search-result"></div>');
-            resultDiv.text(result.display_name);
-            resultDiv.on('click', () => selectLocation(result));
-            resultsContainer.append(resultDiv);
+    // Marker handling
+    var marker;
+    if (hasCoordinates) {
+        marker = L.marker([current_lat, current_lng], {
+            draggable: true
+        }).addTo(map);
+        
+        marker.on('dragend', function(ev) {
+            var pos = ev.target.getLatLng();
+            updateCoordinates(pos.lat, pos.lng);
         });
+        
+        $('#rex-geo-overlay-'+id).hide();
     }
+
+    function updateCoordinates(lat, lng) {
+        $(geofields.lat).val(lat);
+        $(geofields.lng).val(lng);
+        
+        if (!marker) {
+            marker = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(map);
+            
+            marker.on('dragend', function(ev) {
+                var pos = ev.target.getLatLng();
+                updateCoordinates(pos.lat, pos.lng);
+            });
+            
+            $('#rex-geo-overlay-'+id).hide();
+        } else {
+            marker.setLatLng([lat, lng]);
+        }
+    }
+
+    // Search functionality
+    var searchInput = $('#rex-geo-search-input-'+id);
+    var searchResults = $('#rex-geo-search-results-'+id);
+    var searchTimeout;
+
+    // Pre-fill search if address fields exist
+    if (addressfields.length > 0) {
+        var address = [];
+        addressfields.forEach(function(selector) {
+            var value = $(selector).val();
+            if (value) address.push(value);
+        });
+        if (address.length > 0) {
+            searchInput.val(address.join(', '));
+        }
+    }
+
+    searchInput.on('input focus', function() {
+        clearTimeout(searchTimeout);
+        var value = $(this).val();
+        
+        if (value.length < 3) {
+            searchResults.removeClass('active').empty();
+            return;
+        }
+
+        searchTimeout = setTimeout(function() {
+            $.get('https://nominatim.openstreetmap.org/search', {
+                q: value,
+                format: 'json',
+                limit: 5
+            })
+            .done(function(data) {
+                searchResults.empty();
+                
+                if (data.length === 0) {
+                    searchResults.append(
+                        $('<div class="rex-geo-search-result">').text('No results found')
+                    );
+                } else {
+                    data.forEach(function(result) {
+                        $('<div class="rex-geo-search-result">')
+                            .text(result.display_name)
+                            .on('click', function() {
+                                selectLocation(result);
+                                searchResults.removeClass('active');
+                            })
+                            .appendTo(searchResults);
+                    });
+                }
+                searchResults.addClass('active');
+            });
+        }, 300);
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.rex-geo-search-wrapper').length) {
+            searchResults.removeClass('active');
+        }
+    });
 
     function selectLocation(location) {
-        $(geofields.lat).val(location.lat);
-        $(geofields.lng).val(location.lon);
-        map.setView([location.lat, location.lon], defaultZoom);
-        marker.setLatLng([location.lat, location.lon]);
-        $('#rex-geo-search-modal-'+id).hide();
-        $('#rex-geo-search-input-'+id).val('');
-        $('#rex-geo-search-results-'+id).empty();
+        var lat = parseFloat(location.lat);
+        var lng = parseFloat(location.lon);
+        
+        updateCoordinates(lat, lng);
+        map.setView([lat, lng], 16);
+        searchInput.val(location.display_name);
     }
 
     // Browser geolocation
     $('#browser-geo-'+id).on('click', function() {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+        if (!("geolocation" in navigator)) {
+            alert("Your browser doesn't support geolocation.");
+            return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
                 var lat = position.coords.latitude;
                 var lng = position.coords.longitude;
-                $(geofields.lat).val(lat);
-                $(geofields.lng).val(lng);
-                map.setView([lat, lng], defaultZoom);
-                marker.setLatLng([lat, lng]);
-            }, function(error) {
+                
+                updateCoordinates(lat, lng);
+                map.setView([lat, lng], 16);
+            },
+            function(error) {
                 alert("Geolocation failed: " + error.message);
-            });
-        } else {
-            alert("Your browser doesn't support geolocation.");
-        }
+            }
+        );
     });
 
-    // Recenter the map to the curent marker-position
+    // Map center button
     $('#center-geo-'+id).on('click', function(e) {
         e.preventDefault();
-        map.setView(marker.getLatLng(), defaultZoom);
-
-    });        
-
-    // Original address geocoding
-    $('#set-geo-'+id).on('click', function(e) {
-        e.preventDefault();
-
-        var street = $(addressfields[0]).val();
-        var city = $(addressfields[2]).val();
-        var postalcode = $(addressfields[1]).val();
-
-        if(street=='' || city=='' || postalcode == '') {
-            alert('Please fill in the complete address first.');
-            return true;
+        if (marker) {
+            map.setView(marker.getLatLng(), 16);
         }
-
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                var json = JSON.parse(xhr.response);
-                if(json.length==0) {
-                    alert('Address not found')
-                    return false;
-                }
-                $(geofields.lat).val(json[0].lat);
-                $(geofields.lng).val(json[0].lon);
-                map.setView([json[0].lat, json[0].lon], defaultZoom);
-                marker.setLatLng([json[0].lat, json[0].lon]);
-            } else {
-                console.log('An error occurred.');
-            }
-        };
-        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(street+' '+city+' '+postalcode)+'&format=json&polygon=0&addressdetails=0&limit=1');
-        xhr.send();
     });
-}
+};
