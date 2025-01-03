@@ -1,7 +1,8 @@
 yform_geo_osm = Geo (OSM)
 yform_geo_osm_overview = Geo (OSM) Overview
-yform_geo_osm_get_coords = Get coordinates from address
 yform_geo_osm_search_address = Search address
-yform_geo_osm_get_location = Get current location
+yform_geo_osm_get_location = Use my location
 yform_geo_osm_search = Search
 yform_geo_osm_search_placeholder = Enter address...
+yform_geo_osm_no_data = No coordinates available. Please search for an address or set the position manually.
+yform_geo_osm_center_map = Center map
