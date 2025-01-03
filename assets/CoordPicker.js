@@ -8,6 +8,7 @@ class CoordPicker {
         this.currentInput = null;
         this.initModal();
         this.initEvents();
+         this.applyCoordsBeforeSave = this.applyCoordsBeforeSave.bind(this);
     }
 
     initModal() {
@@ -54,6 +55,9 @@ class CoordPicker {
         this.map = null;
         this.marker = null;
         this.currentInput = null;
+          document.querySelectorAll('.rex-coords').forEach(input => {
+               input.removeEventListener('rex:ready', this.applyCoordsBeforeSave);
+            });
     }
 
     initEvents() {
@@ -63,6 +67,7 @@ class CoordPicker {
             input.addEventListener('click', function() {
                 self.openPicker(this);
             });
+             input.addEventListener('rex:ready', this.applyCoordsBeforeSave);
         });
 
         document.querySelector('.rex-coord-close').addEventListener('click', () => this.closeModal());
@@ -90,24 +95,24 @@ class CoordPicker {
             lat = 0;
             lng = 0;
         }
-       this.initMap(lat, lng, !coords); // Übergebe 'initialWorldView' Flag
+       this.initMap(lat, lng, !coords);
     }
 
    initMap(lat, lng, initialWorldView = false) {
-       if (this.map) {
-          this.map.remove();
+        if (this.map) {
+            this.map.remove();
         }
 
-        this.map = L.map('rex-coord-map').setView([lat, lng], initialWorldView ? 2 : 16); // Zoom-Level anpassen
+        this.map = L.map('rex-coord-map').setView([lat, lng], initialWorldView ? 2 : 16);
         
-       L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
-       }).addTo(this.map);
+        }).addTo(this.map);
 
-       this.marker = L.marker([lat, lng], {
+        this.marker = L.marker([lat, lng], {
             draggable: true
-       }).addTo(this.map);
-   }
+        }).addTo(this.map);
+    }
 
     async performSearch(searchText) {
         if (!searchText.trim()) {
@@ -149,8 +154,25 @@ class CoordPicker {
     }
 
     applyCoords() {
+         if (!this.marker) {
+            console.error("Marker ist null. Stelle sicher, dass die Karte initialisiert wurde.");
+            return;
+        }
         const pos = this.marker.getLatLng();
-        this.currentInput.value = `${pos.lat}, ${pos.lng}`;
+        if (this.currentInput) {
+            this.currentInput.value = `${pos.lat}, ${pos.lng}`;
+        }
+        this.closeModal();
+    }
+    applyCoordsBeforeSave(e) {
+         if (!this.marker) {
+            return;
+        }
+         const pos = this.marker.getLatLng();
+        if(e.target){
+            e.target.value = `${pos.lat}, ${pos.lng}`;
+            
+        }
         this.closeModal();
     }
 
@@ -162,16 +184,42 @@ class CoordPicker {
 }
 
 let coordPickerInstance;
+let observer;
 
 $(document).on('rex:ready', function() {
     if (coordPickerInstance) {
         coordPickerInstance.destroyModal();
     }
     coordPickerInstance = new CoordPicker();
+    if (observer) {
+        observer.disconnect();
+    }
 
-    const observer = new MutationObserver(() => {
-        if (coordPickerInstance) {
-            coordPickerInstance.initEvents();
+    observer = new MutationObserver((mutations) => {
+        let relevantChange = false;
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE && (
+                        node.classList.contains('rex-coords') ||
+                        node.querySelectorAll('.rex-coords').length > 0)) {
+                        relevantChange = true;
+                    }
+                });
+                mutation.removedNodes.forEach(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE && (
+                        node.classList.contains('rex-coords') ||
+                        node.querySelectorAll('.rex-coords').length > 0)) {
+                        relevantChange = true;
+                    }
+                });
+            }
+        });
+
+        if (relevantChange) {
+            if (coordPickerInstance) {
+                coordPickerInstance.initEvents();
+            }
         }
     });
 
