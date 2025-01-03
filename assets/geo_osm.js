@@ -1,138 +1,120 @@
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
-    var current_lat = $(geofields.lat).val();
-    var current_lng = $(geofields.lng).val();
     var map, marker;
+    var $lat = $(geofields.lat);
+    var $lng = $(geofields.lng);
+    var $searchInput = $('#rex-geo-search-input-'+id);
+    var $searchResults = $('#rex-geo-search-results-'+id);
+    var $overlay = $('#rex-geo-overlay-'+id);
 
-    initMap();
+    function createMap(lat, lng) {
+        var options = {
+            gestureHandling: true,
+            center: [lat, lng],
+            zoom: 16
+        };
 
-    function initMap() {
-        if (mapbox_token) {
-            var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>';
-            var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
-                {id: 'mapbox.streets', attribution: mapboxAttribution}),
-                streets_satellite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
-                {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
+        var layer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+        });
 
-            map = L.map('map-'+id, {
-                gestureHandling: true,
-                layers: [streets, streets_satellite]
-            });
-
-            L.control.layers({
-                "Map": streets,
-                "Satellite": streets_satellite
-            }).addTo(map);
-        } else {
-            var streets = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            });
-            map = L.map('map-'+id, {
-                gestureHandling: true,
-                layers: [streets]
-            });
-        }
-
-        if (current_lat && current_lng) {
-            setMarker(current_lat, current_lng);
-            $('#rex-geo-overlay-'+id).hide();
-        }
-    }
-
-    function setMarker(lat, lng) {
-        if (marker) {
-            marker.setLatLng([lat, lng]);
-        } else {
-            marker = L.marker([lat, lng], {
-                draggable: true
-            }).addTo(map);
-            
-            marker.on('dragend', function(ev) {
-                var pos = ev.target.getLatLng();
-                updateCoordinates(pos.lat, pos.lng);
-            });
-        }
-        map.setView([lat, lng], 16);
-    }
-
-    function updateCoordinates(lat, lng) {
-        $(geofields.lat).val(lat.toFixed(6));
-        $(geofields.lng).val(lng.toFixed(6));
-        setMarker(lat, lng);
-        $('#rex-geo-overlay-'+id).hide();
-    }
-
-    // Search functionality
-    var searchTimeout;
-    $('#rex-geo-search-input-'+id).on('input focus', function() {
-        clearTimeout(searchTimeout);
-        var value = $(this).val();
-        var $results = $('#rex-geo-search-results-'+id);
+        map = L.map('map-'+id, options);
+        layer.addTo(map);
         
+        marker = L.marker([lat, lng], {draggable: true}).addTo(map);
+        marker.on('dragend', function(e) {
+            savePosition(e.target.getLatLng());
+        });
+
+        $overlay.hide();
+    }
+
+    function savePosition(pos) {
+        $lat.val(pos.lat.toFixed(6));
+        $lng.val(pos.lng.toFixed(6));
+    }
+
+    function handleSearch() {
+        var value = $searchInput.val();
         if (value.length < 3) {
-            $results.removeClass('active').empty();
+            $searchResults.removeClass('active').empty();
             return;
         }
 
-        searchTimeout = setTimeout(function() {
-            $.get('https://nominatim.openstreetmap.org/search', {
-                q: value,
-                format: 'json',
-                limit: 5
-            })
-            .done(function(data) {
-                $results.empty();
-                
-                if (data.length === 0) {
-                    $results.append(
-                        $('<div class="rex-geo-search-result">').text('No results found')
-                    );
-                } else {
-                    data.forEach(function(result) {
-                        $('<div class="rex-geo-search-result">')
-                            .text(result.display_name)
-                            .on('click', function() {
-                                updateCoordinates(result.lat, result.lon);
-                                $(this).closest('.rex-geo-search-results').removeClass('active');
-                            })
-                            .appendTo($results);
-                    });
-                }
-                $results.addClass('active');
+        $.get('https://nominatim.openstreetmap.org/search', {
+            q: value,
+            format: 'json',
+            limit: 5
+        }).done(function(data) {
+            $searchResults.empty();
+            
+            data.forEach(function(result) {
+                $('<div class="rex-geo-search-result">')
+                    .text(result.display_name)
+                    .on('click', function() {
+                        if (!map) {
+                            createMap(result.lat, result.lon);
+                        } else {
+                            marker.setLatLng([result.lat, result.lon]);
+                            map.setView([result.lat, result.lon], 16);
+                        }
+                        savePosition(marker.getLatLng());
+                        $searchResults.removeClass('active');
+                    })
+                    .appendTo($searchResults);
             });
-        }, 300);
+            
+            $searchResults.addClass('active');
+        });
+    }
+
+    // Initialize if coordinates exist
+    if ($lat.val() && $lng.val()) {
+        createMap($lat.val(), $lng.val());
+    }
+
+    // Search handling
+    var searchTimeout;
+    $searchInput.on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(handleSearch, 300);
     });
 
+    // Fill search from address fields
+    $('#search-geo-'+id).on('click', function() {
+        var address = [];
+        addressfields.forEach(function(selector) {
+            var value = $(selector).val();
+            if (value) address.push(value);
+        });
+        if (address.length) {
+            $searchInput.val(address.join(', ')).trigger('input');
+        }
+    });
+
+    // Geolocation
+    $('#browser-geo-'+id).on('click', function() {
+        if (!("geolocation" in navigator)) return;
+        
+        navigator.geolocation.getCurrentPosition(function(position) {
+            if (!map) {
+                createMap(position.coords.latitude, position.coords.longitude);
+            } else {
+                marker.setLatLng([position.coords.latitude, position.coords.longitude]);
+                map.setView([position.coords.latitude, position.coords.longitude], 16);
+            }
+            savePosition(marker.getLatLng());
+        });
+    });
+
+    // Center map
+    $('#center-geo-'+id).on('click', function() {
+        if (marker) map.setView(marker.getLatLng(), 16);
+    });
+
+    // Close search results on outside click
     $(document).on('click', function(e) {
         if (!$(e.target).closest('.rex-geo-search-wrapper').length) {
-            $('.rex-geo-search-results').removeClass('active');
-        }
-    });
-
-    // Browser geolocation
-    $('#browser-geo-'+id).on('click', function() {
-        if (!("geolocation" in navigator)) {
-            alert("Your browser doesn't support geolocation.");
-            return;
-        }
-        
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                updateCoordinates(
-                    position.coords.latitude,
-                    position.coords.longitude
-                );
-            },
-            function(error) {
-                alert("Geolocation failed: " + error.message);
-            }
-        );
-    });
-
-    // Map center button
-    $('#center-geo-'+id).on('click', function(e) {
-        e.preventDefault();
-        if (marker) {
-            map.setView(marker.getLatLng(), 16);
+            $searchResults.removeClass('active');
         }
     });
 };
