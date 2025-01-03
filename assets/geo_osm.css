@@ -1,269 +1,137 @@
 :root {
-   --rex-geo-background: #fff;
-   --rex-geo-background-hover: #f8f9fa;
-   --rex-geo-text: #212529;
-   --rex-geo-border: #dee2e6;
-   --rex-geo-input-bg: #fff;
-   --rex-geo-input-text: #212529;
-   --rex-geo-input-border: #dee2e6;
-   --rex-geo-shadow: rgba(0,0,0,0.1);
-   --rex-geo-primary: #2196F3;
-   --rex-geo-primary-hover: #1e87db;
-   --rex-geo-success: #4CAF50;
-   --rex-geo-success-hover: #45a049;
+    --rex-geo-background: #fff;
+    --rex-geo-text: #212529;
+    --rex-geo-border: #dee2e6;
+    --rex-geo-input-bg: #fff;
+    --rex-geo-input-text: #212529;
+    --rex-geo-input-border: #dee2e6;
+    --rex-geo-shadow: rgba(0,0,0,0.1);
+    --rex-geo-hover: #f8f9fa;
+    --rex-geo-overlay-bg: rgba(255,255,255,0.9);
 }
 
-/* Dark theme colors */
+/* Dark theme */
 :root[data-theme="dark"], 
 .rex-has-theme.rex-theme-dark {
-   --rex-geo-background: #32373c;
-   --rex-geo-background-hover: #3c4146;
-   --rex-geo-text: #fff;
-   --rex-geo-border: #404448;
-   --rex-geo-input-bg: #282c30;
-   --rex-geo-input-text: #fff;
-   --rex-geo-input-border: #404448;
-   --rex-geo-shadow: rgba(0,0,0,0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-   :root {
-       --rex-geo-background: #32373c;
-       --rex-geo-background-hover: #3c4146;
-       --rex-geo-text: #fff;
-       --rex-geo-border: #404448;
-       --rex-geo-input-bg: #282c30;
-       --rex-geo-input-text: #fff;
-       --rex-geo-input-border: #404448;
-       --rex-geo-shadow: rgba(0,0,0,0.3);
-   }
-}
-.rex-geo-search-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-
-.rex-geo-search-content {
-    background-color: var(--rex-geo-background);
-    color: var(--rex-geo-text);
-    margin: 10% auto;
-    padding: 30px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    position: relative;
-    box-shadow: 0 4px 6px var(--rex-geo-shadow);
-    border: 1px solid var(--rex-geo-border);
-}
-
-.rex-geo-search-close {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 28px;
-    cursor: pointer;
-    opacity: 0.7;
-    color: var(--rex-geo-text);
-}
-
-.rex-geo-search-close:hover {
-    opacity: 1;
+    --rex-geo-background: #32373c;
+    --rex-geo-text: #fff;
+    --rex-geo-border: #404448;
+    --rex-geo-input-bg: #282c30;
+    --rex-geo-input-text: #fff;
+    --rex-geo-input-border: #404448;
+    --rex-geo-shadow: rgba(0,0,0,0.3);
+    --rex-geo-hover: #3c4146;
+    --rex-geo-overlay-bg: rgba(50,55,60,0.9);
 }
 
 .rex-geo-search-wrapper {
-    margin: 20px auto;
-    width: 90%;
+    position: relative;
+    margin-bottom: 1rem;
 }
 
 .rex-geo-search-input {
     width: 100%;
-    font-size: 24px !important;
-    padding: 15px !important;
-    border: 2px solid var(--rex-geo-input-border) !important;
-    border-radius: 8px !important;
-    height: auto !important;
-    background-color: var(--rex-geo-input-bg) !important;
-    color: var(--rex-geo-input-text) !important;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--rex-geo-input-border);
+    border-radius: 4px;
+    background-color: var(--rex-geo-input-bg);
+    color: var(--rex-geo-input-text);
+    transition: border-color 0.2s ease;
 }
 
 .rex-geo-search-input:focus {
-    border-color: var(--rex-geo-primary) !important;
+    border-color: #4CAF50;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.2);
 }
 
-.search-results {
-    max-height: 400px;
-    overflow-y: auto;
-    margin: 15px auto;
-    width: 90%;
-}
-
-.search-result {
-    padding: 12px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--rex-geo-border);
-    transition: background-color 0.2s ease;
-    font-size: 16px;
-    color: var(--rex-geo-text);
-}
-
-.search-result:hover {
-    background-color: var(--rex-geo-background-hover);
-}
-
-.btn.browser-location {
-    background-color: var(--rex-geo-success);
-    border-color: var(--rex-geo-success);
-    color: #fff;
-}
-
-.btn.browser-location:hover {
-    background-color: var(--rex-geo-success-hover);
-    border-color: var(--rex-geo-success-hover);
-}
-
-.btn.search, 
-.btn.set {
-    background-color: var(--rex-geo-primary);
-    border-color: var(--rex-geo-primary);
-    color: #fff;
-}
-
-.btn.search:hover,
-.btn.set:hover {
-    background-color: var(--rex-geo-primary-hover);
-    border-color: var(--rex-geo-primary-hover);
-}
-
-
-.rex-coord-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-
-.rex-coord-content {
-    background-color: #fff;
-    margin: 5% auto;
-    width: 90%;
-    max-width: 900px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    overflow: hidden;
-}
-
-.rex-coord-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.rex-coord-header h3 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.rex-coord-close {
-    font-size: 24px;
-    cursor: pointer;
-    opacity: 0.7;
-}
-
-.rex-coord-close:hover {
-    opacity: 1;
-}
-
-.rex-coord-search {
-    padding: 15px 20px;
-    position: relative;
-}
-
-#rex-coord-search-input {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-#rex-coord-search-results {
+.rex-geo-search-results {
     position: absolute;
     top: 100%;
-    left: 20px;
-    right: 20px;
-    background: white;
-    border: 1px solid #ddd;
+    left: 0;
+    right: 0;
+    background: var(--rex-geo-background);
+    border: 1px solid var(--rex-geo-border);
     border-radius: 4px;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
-    z-index: 2000;
+    z-index: 1000;
+    box-shadow: 0 4px 6px var(--rex-geo-shadow);
+    display: none;
 }
 
-.search-result {
-    padding: 10px;
+.rex-geo-search-results.active {
+    display: block;
+}
+
+.rex-geo-search-result {
+    padding: 0.75rem;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--rex-geo-border);
+    color: var(--rex-geo-text);
+    transition: background-color 0.2s ease;
 }
 
-.search-result:hover {
-    background-color: #f5f5f5;
+.rex-geo-search-result:hover,
+.rex-geo-search-result:focus {
+    background-color: var(--rex-geo-hover);
 }
 
-#rex-coord-map {
-    height: 400px;
-    width: 100%;
+.rex-geo-search-result:last-child {
+    border-bottom: none;
 }
 
-.rex-coord-footer {
-    padding: 15px 20px;
-    border-top: 1px solid #eee;
-    text-align: right;
+/* Map container */
+[id^="map-"] {
+    position: relative;
+    min-height: 400px;
+    border-radius: 4px;
+    overflow: hidden;
+    touch-action: none;
 }
 
-.rex-coord-footer button {
-    margin-left: 10px;
+/* Overlay for empty state */
+.rex-geo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--rex-geo-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
-/* Dark theme support */
-body.rex-has-theme.rex-theme-dark .rex-coord-content {
-    background-color: #32373c;
-    color: #fff;
+.rex-geo-overlay-content {
+    text-align: center;
+    color: var(--rex-geo-text);
+    padding: 2rem;
+    font-size: 1.25rem;
 }
 
-body.rex-has-theme.rex-theme-dark .rex-coord-header,
-body.rex-has-theme.rex-theme-dark .rex-coord-footer {
-    border-color: #404448;
+/* Button group improvements */
+.btn-group {
+    margin: 1rem 0;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
-body.rex-has-theme.rex-theme-dark #rex-coord-search-input {
-    background-color: #282c30;
-    border-color: #404448;
-    color: #fff;
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 44px; /* Touch friendly */
+    min-width: 44px;  /* Touch friendly */
 }
 
-body.rex-has-theme.rex-theme-dark #rex-coord-search-results {
-    background-color: #32373c;
-    border-color: #404448;
-}
-
-body.rex-has-theme.rex-theme-dark .search-result {
-    border-color: #404448;
-}
-
-body.rex-has-theme.rex-theme-dark .search-result:hover {
-    background-color: #3c4146;
+/* Leaflet custom styles */
+.leaflet-touch .leaflet-bar a {
+    min-width: 44px;
+    min-height: 44px;
+    line-height: 44px;
 }
