@@ -1,24 +1,11 @@
 var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     var current_lat = $(geofields.lat).val();
     var current_lng = $(geofields.lng).val();
-    
-    // Map initialization
-    var map = initMap();
-    var marker;
+    var map, marker;
 
-    if (current_lat && current_lng) {
-        setMarker(current_lat, current_lng);
-        $('#rex-geo-overlay-'+id).hide();
-    }
+    initMap();
 
     function initMap() {
-        var mapOptions = {
-            gestureHandling: true,
-            duration: 500,
-            center: [30, 0],
-            zoom: 2
-        };
-
         if (mapbox_token) {
             var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, Imagery © <a href="http://mapbox.com">Mapbox</a>';
             var streets = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
@@ -26,22 +13,29 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
                 streets_satellite = L.tileLayer('//api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+mapbox_token, 
                 {id: 'mapbox.streets-satellite', attribution: mapboxAttribution});
 
-            mapOptions.layers = [streets, streets_satellite];
-            var map = L.map('map-'+id, mapOptions);
+            map = L.map('map-'+id, {
+                gestureHandling: true,
+                layers: [streets, streets_satellite]
+            });
 
             L.control.layers({
                 "Map": streets,
                 "Satellite": streets_satellite
             }).addTo(map);
-            
-            return map;
-        } 
+        } else {
+            var streets = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            });
+            map = L.map('map-'+id, {
+                gestureHandling: true,
+                layers: [streets]
+            });
+        }
 
-        var streets = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        });
-        mapOptions.layers = [streets];
-        return L.map('map-'+id, mapOptions);
+        if (current_lat && current_lng) {
+            setMarker(current_lat, current_lng);
+            $('#rex-geo-overlay-'+id).hide();
+        }
     }
 
     function setMarker(lat, lng) {
