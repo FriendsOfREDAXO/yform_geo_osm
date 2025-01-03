@@ -56,8 +56,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     }
 
     function updateCoordinates(lat, lng) {
-        $(geofields.lat).val(lat);
-        $(geofields.lng).val(lng);
+        $(geofields.lat).val(lat.toFixed(6));
+        $(geofields.lng).val(lng.toFixed(6));
         
         if (!marker) {
             marker = L.marker([lat, lng], {
@@ -80,8 +80,8 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
     var searchResults = $('#rex-geo-search-results-'+id);
     var searchTimeout;
 
-    // Pre-fill search if address fields exist
-    if (addressfields.length > 0) {
+    // Pre-fill search only if we don't have coordinates
+    if (!hasCoordinates && addressfields.length > 0) {
         var address = [];
         addressfields.forEach(function(selector) {
             var value = $(selector).val();
