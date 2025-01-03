@@ -1,97 +1,21 @@
 :root {
-    --rex-geo-background: #fff;
-    --rex-geo-text: #212529;
-    --rex-geo-border: #dee2e6;
-    --rex-geo-input-bg: #fff;
-    --rex-geo-input-text: #212529;
-    --rex-geo-input-border: #dee2e6;
-    --rex-geo-shadow: rgba(0,0,0,0.1);
-    --rex-geo-hover: #f8f9fa;
-    --rex-geo-overlay-bg: rgba(255,255,255,0.9);
+    --rex-geo-overlay-bg: var(--bs-body-bg, rgba(255,255,255,0.9));
 }
 
-/* Dark theme */
-:root[data-theme="dark"], 
 .rex-has-theme.rex-theme-dark {
-    --rex-geo-background: #32373c;
-    --rex-geo-text: #fff;
-    --rex-geo-border: #404448;
-    --rex-geo-input-bg: #282c30;
-    --rex-geo-input-text: #fff;
-    --rex-geo-input-border: #404448;
-    --rex-geo-shadow: rgba(0,0,0,0.3);
-    --rex-geo-hover: #3c4146;
     --rex-geo-overlay-bg: rgba(50,55,60,0.9);
 }
 
-.rex-geo-search-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.rex-geo-search-input {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border: 2px solid var(--rex-geo-input-border);
-    border-radius: 4px;
-    background-color: var(--rex-geo-input-bg);
-    color: var(--rex-geo-input-text);
-    transition: border-color 0.2s ease;
-}
-
-.rex-geo-search-input:focus {
-    border-color: #4CAF50;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(76,175,80,0.2);
-}
-
-.rex-geo-search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--rex-geo-background);
-    border: 1px solid var(--rex-geo-border);
-    border-radius: 4px;
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 4px 6px var(--rex-geo-shadow);
-    display: none;
-}
-
-.rex-geo-search-results.active {
-    display: block;
-}
-
-.rex-geo-search-result {
-    padding: 0.75rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--rex-geo-border);
-    color: var(--rex-geo-text);
-    transition: background-color 0.2s ease;
-}
-
-.rex-geo-search-result:hover,
-.rex-geo-search-result:focus {
-    background-color: var(--rex-geo-hover);
-}
-
-.rex-geo-search-result:last-child {
-    border-bottom: none;
-}
-
-/* Map container */
+/* Map container and overlay */
 [id^="map-"] {
     position: relative;
     min-height: 400px;
-    border-radius: 4px;
+    border-radius: var(--bs-border-radius, 0.25rem);
+    border: 1px solid var(--bs-border-color, #dee2e6);
     overflow: hidden;
     touch-action: none;
 }
 
-/* Overlay for empty state */
 .rex-geo-overlay {
     position: absolute;
     top: 0;
@@ -107,29 +31,74 @@
 
 .rex-geo-overlay-content {
     text-align: center;
-    color: var(--rex-geo-text);
     padding: 2rem;
-    font-size: 1.25rem;
 }
 
-/* Button group improvements */
+/* Search functionality */
+.rex-geo-search-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.rex-geo-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--bs-border-radius, 0.25rem);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.rex-geo-search-results.active {
+    display: block;
+}
+
+.rex-geo-search-result {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.rex-geo-search-result:last-child {
+    border-bottom: 0;
+}
+
+.rex-geo-search-result:hover {
+    background-color: var(--bs-light, #f8f9fa);
+}
+
+/* Button styling */
 .btn-group {
     margin: 1rem 0;
-    display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.btn {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    min-height: 44px; /* Touch friendly */
-    min-width: 44px;  /* Touch friendly */
+/* Dark mode adjustments */
+.rex-has-theme.rex-theme-dark [id^="map-"] {
+    filter: brightness(0.8) invert(1) hue-rotate(180deg);
 }
 
-/* Leaflet custom styles */
+.rex-has-theme.rex-theme-dark [id^="map-"] img {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+.rex-has-theme.rex-theme-dark .rex-geo-search-result:hover {
+    background-color: var(--bs-gray-800, #343a40);
+}
+
+/* Leaflet overrides */
+.leaflet-touch .leaflet-control-layers, 
+.leaflet-touch .leaflet-bar {
+    border: 1px solid var(--bs-border-color, #dee2e6) !important;
+}
+
 .leaflet-touch .leaflet-bar a {
     min-width: 44px;
     min-height: 44px;
