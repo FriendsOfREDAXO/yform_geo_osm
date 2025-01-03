@@ -75,8 +75,9 @@
 }
 
 .rex-geo-search-result,
-.rex-coord-search-result {
-    padding: 0.75rem;
+.rex-coord-search-result,
+.search-result {
+    padding: 15px 20px;
     cursor: pointer;
     border-bottom: 1px solid var(--rex-geo-border);
     color: var(--rex-geo-text);
