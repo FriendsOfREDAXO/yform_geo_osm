@@ -1,10 +1,10 @@
-var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
+var rex_geo_osm = function (addressfields, geofields, id, mapbox_token) {
     var map, marker;
     var $lat = $(geofields.lat);
     var $lng = $(geofields.lng);
-    var $searchInput = $('#rex-geo-search-input-'+id);
-    var $searchResults = $('#rex-geo-search-results-'+id);
-    var $overlay = $('#rex-geo-overlay-'+id);
+    var $searchInput = $('#rex-geo-search-input-' + id);
+    var $searchResults = $('#rex-geo-search-results-' + id);
+    var $overlay = $('#rex-geo-overlay-' + id);
     var hasCoordinates = $lat.val() && $lng.val();
 
     // Initialize overlay
@@ -27,15 +27,15 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
         });
 
         if (!map) {
-            map = L.map('map-'+id, options);
+            map = L.map('map-' + id, options);
             layer.addTo(map);
         } else {
             map.setView([lat, lng], 16);
         }
-        
+
         if (!marker) {
-            marker = L.marker([lat, lng], {draggable: true}).addTo(map);
-            marker.on('dragend', function(e) {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', function (e) {
                 savePosition(e.target.getLatLng());
             });
         } else {
@@ -61,9 +61,9 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             q: value,
             format: 'json',
             limit: 5
-        }).done(function(data) {
+        }).done(function (data) {
             $searchResults.empty();
-            
+
             if (data.length === 0) {
                 $searchResults.append(
                     $('<div class="rex-geo-search-result">').text('No results found')
@@ -72,33 +72,33 @@ var rex_geo_osm = function(addressfields, geofields, id, mapbox_token) {
             }
 
             // Im YForm Geocoder:
-data.forEach(function(result) {
-    $('<div class="rex-geo-search-result">')
-        .text(result.display_name)
-        .on('click', function() {
-            var lat = parseFloat(result.lat);
-            var lng = parseFloat(result.lon);
-            createMap(lat, lng);
-            savePosition({lat: lat, lng: lng});
-            $searchInput.val(result.display_name);
-            $searchResults.removeClass('active').empty(); // Leeren und ausblenden
-        })
-        .appendTo($searchResults);
-});
-            
+            data.forEach(function (result) {
+                $('<div class="rex-geo-search-result">')
+                    .text(result.display_name)
+                    .on('click', function () {
+                        var lat = parseFloat(result.lat);
+                        var lng = parseFloat(result.lon);
+                        createMap(lat, lng);
+                        savePosition({ lat: lat, lng: lng });
+                        $searchInput.val(result.display_name);
+                        $searchResults.removeClass('active').empty(); // Leeren und ausblenden
+                    })
+                    .appendTo($searchResults);
+            });
+
             $searchResults.addClass('active');
         });
     }
 
     var searchTimeout;
-    $searchInput.on('input', function() {
+    $searchInput.on('input', function () {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(handleSearch, 300);
     });
 
-    $('#search-geo-'+id).on('click', function() {
+    $('#search-geo-' + id).on('click', function () {
         var address = [];
-        addressfields.forEach(function(selector) {
+        addressfields.forEach(function (selector) {
             var value = $(selector).val();
             if (value) address.push(value);
         });
@@ -107,33 +107,33 @@ data.forEach(function(result) {
         }
     });
 
-    $('#browser-geo-'+id).on('click', function() {
+    $('#browser-geo-' + id).on('click', function () {
         if (!("geolocation" in navigator)) {
             alert("Geolocation is not supported by this browser.");
             return;
         }
-        
+
         navigator.geolocation.getCurrentPosition(
-            function(position) {
+            function (position) {
                 createMap(position.coords.latitude, position.coords.longitude);
                 savePosition({
-                    lat: position.coords.latitude, 
+                    lat: position.coords.latitude,
                     lng: position.coords.longitude
                 });
             },
-            function(error) {
+            function (error) {
                 alert("Error getting location: " + error.message);
             }
         );
     });
 
-    $('#center-geo-'+id).on('click', function() {
+    $('#center-geo-' + id).on('click', function () {
         if (map && marker) {
             map.setView(marker.getLatLng(), 16);
         }
     });
 
-    $(document).on('click', function(e) {
+    $(document).on('click', function (e) {
         if (!$(e.target).closest('.rex-geo-search-wrapper').length) {
             $searchResults.removeClass('active');
         }
