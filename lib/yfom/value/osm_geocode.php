@@ -8,12 +8,10 @@ use rex_yform_value_abstract;
 
 use function sprintf;
 
+use function sprintf;
+
 /**
  * YForm value field for OpenStreetMap integration.
- * 
- * This class provides a map field for YForm with geocoding capabilities.
- * It allows to select coordinates via map interface and can handle both
- * separate lat/lng fields and combined coordinate storage.
  * 
  * @package redaxo\yform\geo-osm
  * @author Friends Of REDAXO
