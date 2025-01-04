@@ -41,17 +41,17 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
         <button type="button" 
                 class="btn btn-primary search" 
                 id="search-geo-<?= $fieldId ?>">
-            <?= rex_i18n::msg('yform_geo_osm_search_address') ?>
+            <i class="fa-solid fa-magnifying-glass"></i>  <?= rex_i18n::msg('yform_geo_osm_search_address') ?>
         </button>
         <button type="button" 
                 class="btn btn-primary browser-location" 
                 id="browser-geo-<?= $fieldId ?>">
-            <?= rex_i18n::msg('yform_geo_osm_get_location') ?>
+            <i class="fa-solid fa-location-crosshairs"></i>  <?= rex_i18n::msg('yform_geo_osm_get_location') ?>
         </button>
         <button type="button" 
                 class="btn btn-default map-center" 
                 id="center-geo-<?= $fieldId ?>">
-            <?= rex_i18n::msg('yform_geo_osm_center_map') ?>
+            <i class="fa-solid fa-arrows-to-circle"></i> <?= rex_i18n::msg('yform_geo_osm_center_map') ?>
         </button>
     </div>
 
