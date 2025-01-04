@@ -32,7 +32,7 @@
 /* Dark mode map adjustments */
 .rex-has-theme.rex-theme-dark [id^="map-"],
 .rex-has-theme.rex-theme-dark #rex-coord-map {
-    filter: grayscale(50%) hue-rotate(30deg) brightness(100%) contrast(85%);
+     filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
 .rex-has-theme.rex-theme-dark [id^="map-"] img,
