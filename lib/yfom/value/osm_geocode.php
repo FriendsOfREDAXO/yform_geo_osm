@@ -8,8 +8,6 @@ use rex_yform_value_abstract;
 
 use function sprintf;
 
-use function sprintf;
-
 /**
  * YForm value field for OpenStreetMap integration.
  * 
