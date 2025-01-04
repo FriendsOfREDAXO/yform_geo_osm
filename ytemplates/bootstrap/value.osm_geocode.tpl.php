@@ -57,12 +57,14 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
     </div>
 
     <div class="map-wrapper">
-        <div id="map-<?= $fieldId ?>"<?= $htmlAttributes ?>></div>
-        <div id="rex-geo-overlay-<?= $fieldId ?>" class="rex-geo-overlay">
+        <div id="map-<?= $fieldId ?>"<?= $htmlAttributes ?>>
+            <div id="rex-geo-overlay-<?= $fieldId ?>" class="rex-geo-overlay">
             <div class="rex-geo-overlay-content">
                 <?= rex_i18n::msg('yform_geo_osm_no_data') ?>
             </div>
         </div>
+        </div>
+        
     </div>
 </div>
 
