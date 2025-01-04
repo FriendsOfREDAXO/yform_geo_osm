@@ -185,3 +185,6 @@
 #rex-coord-search-results.active {
     display: block;
 }
+[id^="map-"] {
+    position: relative;
+}
