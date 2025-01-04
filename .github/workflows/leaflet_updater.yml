@@ -1,0 +1,41 @@
+name: Download Latest Leaflet
+
+on:
+  workflow_dispatch: # Ermöglicht manuelle Auslösung des Workflows
+
+jobs:
+  download_leaflet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get Latest Leaflet Version
+        id: get_version
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/Leaflet/Leaflet/releases/latest | jq -r .tag_name)
+          echo "::set-output name=version::$LATEST_VERSION"
+
+      - name: Download Leaflet
+        run: |
+          LATEST_VERSION="${{ steps.get_version.outputs.version }}"
+          echo "Downloading Leaflet version $LATEST_VERSION..."
+          curl -L "https://github.com/Leaflet/Leaflet/releases/download/${LATEST_VERSION}/leaflet-${LATEST_VERSION}.zip" -o leaflet.zip
+          unzip leaflet.zip
+          
+      - name: Remove Old Leaflet Directory
+        run: |
+          if [ -d "assets/leaflet" ]; then
+            echo "Deleting old leaflet directory..."
+            rm -rf assets/leaflet
+          fi
+
+      - name: Move Leaflet Files
+        run: |
+          mv leaflet/dist assets/leaflet
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update Leaflet to ${{ steps.get_version.outputs.version }}"
+          branch: ${{ github.ref }} # Commit auf dem aktuellen Branch
