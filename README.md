@@ -198,6 +198,22 @@ In diesem Fall werden die Koordinaten in einem Feld gespeichert. Das Feld muss d
 </div>
 ```
 
+## Gestaltung der Karte
+
+Die Karte kann mittels JSON-Attriebute gestaltet und ein wenig konfiguriert werden. 
+
+> Hinweis: die ID sollte besser nicht verändert werden, da diese durch die Skripte benötigt wird. Selbstverständlich könnte man sie so fixieren. Schreibweise `map-xx`
+
+
+```json
+{
+    "style": "height: 400px",
+    "class": "my_class",
+    "data-max-zoom": "12",
+    "data-min-zoom": "2"
+}
+```
+
 ## Lizenz
 
 MIT-Lizenz, siehe [LICENSE](LICENSE)
