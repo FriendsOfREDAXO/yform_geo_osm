@@ -1,7 +1,5 @@
 <?php
 
-namespace FriendsOfRedaxo\YFormGeoOsm;
-
 use rex_functional_exception;
 use rex_i18n;
 use rex_yform_value_abstract;
