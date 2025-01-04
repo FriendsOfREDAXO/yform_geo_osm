@@ -1,11 +1,5 @@
 <?php
 
-use rex_functional_exception;
-use rex_i18n;
-use rex_yform_value_abstract;
-
-use function sprintf;
-
 /**
  * YForm value field for OpenStreetMap integration.
  * 
@@ -43,9 +37,9 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     protected ?rex_yform_value_abstract $latLngInput = null;
 
     /**
-     * Die Hilfsfelder im Formular für Lat/Lng identifizieren.
-     * Falls es reine Hilfsfelder sind (no_db) werden die Felder
-     * beim ersten Aufruf vorbefüllt mit den Daten aus diesem Feld.
+     * Identifies and initializes the helper fields for Lat/Lng in the form.
+     * If they are pure helper fields (no_db), they are pre-filled with data
+     * from this field on first call.
      *
      * @throws rex_functional_exception
      * @return void
@@ -114,18 +108,11 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             }
         }
 
-        // Legacy support for height and format
+        // Legacy support for height 
         $height = $this->getElement('height');
-        $mapclass = $this->getElement('format');
-        
-        // Only apply legacy attributes if no new attributes are set
-        if (empty($mapAttributes)) {
-            if ($mapclass) {
-                $mapAttributes['class'] = $mapclass;
-            } elseif ($height) {
-                $height = is_numeric($height) ? $height . 'px' : $height;
-                $mapAttributes['style'] = 'height: ' . $height;
-            }
+        if (empty($mapAttributes) && $height) {
+            $height = is_numeric($height) ? $height . 'px' : $height;
+            $mapAttributes['style'] = 'height: ' . $height;
         }
 
         $mapbox_token = $this->getElement('mapbox_token');
@@ -152,18 +139,17 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     public function getDescription(): string
     {
-        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|class|[mapbox_token]|[no_db]|[map_attributes]';
+        return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[mapbox_token]|[no_db]|[map_attributes]';
     }
 
     /**
      * Returns the field definitions including validation rules.
-     * This defines the field structure and behavior in YForm.
      *
      * @return array<string, mixed>
      */
     public function getDefinitions(): array
     {
-        return [
+        $definitions = [
             'type' => 'value',
             'name' => 'osm_geocode',
             'values' => [
@@ -172,11 +158,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'latlng' => [
                     'type' => 'text',
                     'label' => 'Koordinaten-Felder',
-                    'notice' => 'Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»',
-                    'validate' => [
-                        ['type' => 'not_empty', 'message' => 'Bitte Koordinaten-Felder angeben.'],
-                        ['type' => 'preg_match', 'pattern' => '/^[a-zA-Z0-9_]+,[a-zA-Z0-9_]+$/', 'message' => 'Bitte genau zwei Felder durch Komma getrennt angeben.']
-                    ]
+                    'notice' => 'Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»'
                 ],
                 'address' => [
                     'type' => 'text',
@@ -186,11 +168,6 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'height' => [
                     'type' => 'text',
                     'label' => 'Map-H&ouml;he (Legacy)',
-                    'notice' => 'Deprecated: Bitte map_attributes verwenden'
-                ],
-                'format' => [
-                    'type' => 'text',
-                    'label' => 'CSS-Klasse (Legacy)',
                     'notice' => 'Deprecated: Bitte map_attributes verwenden'
                 ],
                 'map_attributes' => [
@@ -205,91 +182,65 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 ],
                 'no_db' => ['type' => 'no_db', 'default' => 0]
             ],
-            'validates' => [
-                [
-                    'type' => 'custom',
-                    'name' => 'latlng',
-                    'message' => 'Die angegebenen Koordinaten-Felder existieren nicht in der Tabelle.',
-                    'parameters' => [
-                        'function' => static function($values) {
-                            $value = $values['value'];
-                            $coord_field_names = array_map(trim(...), explode(',', $value));
-                            $coord_field_names = array_filter($coord_field_names, strlen(...));
-                            
-                            // Liste der Feldnamen in der Tabelle abrufen
-                            $sql = rex_sql::factory();
-                            $field_list = $sql->getArray(
-                                'SELECT name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
-                                [
-                                    ':ti' => 'value',
-                                    ':tn' => $values['this']->getParam('main_table')
-                                ]
-                            );
-                            $field_list = array_column($field_list, 'name');
-
-                            // Prüfen ob alle Felder existieren
-                            foreach ($coord_field_names as $field) {
-                                if (!in_array($field, $field_list)) {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        }
-                    ]
-                ],
-                [
-                    'type' => 'custom',
-                    'name' => 'map_attributes',
-                    'message' => 'Ungültiges JSON-Format für Map Attribute.',
-                    'parameters' => [
-                        'function' => static function($values) {
-                            $value = $values['value'];
-                            if (empty($value)) {
-                                return true;
-                            }
-                            try {
-                                $attributes = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-                                return is_array($attributes);
-                            } catch (\JsonException $e) {
-                                return false;
-                            }
-                        }
-                    ]
-                ],
-                [
-                    'type' => 'custom',
-                    'name' => 'format_height',
-                    'message' => 'Es kann entweder nur die Map-Höhe oder nur die CSS-Klasse verwendet werden.',
-                    'parameters' => [
-                        'function' => static function($values) {
-                            $height = $values['this']->getElement('height');
-                            $format = $values['this']->getElement('format');
-                            $mapAttributes = $values['this']->getElement('map_attributes');
-
-                            // Wenn map_attributes gesetzt ist, ignoriere die Legacy-Felder
-                            if (!empty($mapAttributes)) {
-                                return true;
-                            }
-
-                            // Beide Legacy-Felder sind gesetzt
-                            if (!empty($height) && !empty($format)) {
-                                return false;
-                            }
-
-                            // Prüfe Höhenformat wenn gesetzt
-                            if (!empty($height)) {
-                                return preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@', $height);
-                            }
-
-                            return true;
-                        }
-                    ]
-                ]
-            ],
             'description' => '🧩 yform_geo_osm: OpenStreetMap-Karte und Geoocodierung',
             'dbtype' => 'varchar(191)',
             'formbuilder' => false,
             'multi_edit' => false,
         ];
+
+        $this->params['validates'][] = [
+            'type' => 'preg_match',
+            'name' => 'latlng',
+            'message' => 'Bitte genau zwei Felder durch Komma getrennt angeben.',
+            'pattern' => '/^[a-zA-Z0-9_]+,[a-zA-Z0-9_]+$/',
+            'not_required' => false
+        ];
+
+        $this->params['validates'][] = [
+            'type' => 'custom',
+            'name' => 'latlng',
+            'message' => 'Die angegebenen Koordinaten-Felder existieren nicht in der Tabelle.',
+            'validate' => function($value) {
+                $coord_field_names = array_map('trim', explode(',', $value));
+                $coord_field_names = array_filter($coord_field_names);
+                
+                $sql = rex_sql::factory();
+                $field_list = $sql->getArray(
+                    'SELECT name FROM ' . rex::getTable('yform_field') . ' 
+                     WHERE type_id = :ti AND table_name = :tn',
+                    [
+                        ':ti' => 'value',
+                        ':tn' => $this->params['main_table']
+                    ]
+                );
+                $field_list = array_column($field_list, 'name');
+
+                foreach ($coord_field_names as $field) {
+                    if (!in_array($field, $field_list)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        ];
+
+        $this->params['validates'][] = [
+            'type' => 'custom',
+            'name' => 'map_attributes',
+            'message' => 'Ungültiges JSON-Format für Map Attribute.',
+            'validate' => function($value) {
+                if (empty($value)) {
+                    return true;
+                }
+                try {
+                    $attributes = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                    return is_array($attributes);
+                } catch (\JsonException $e) {
+                    return false;
+                }
+            }
+        ];
+
+        return $definitions;
     }
 }
