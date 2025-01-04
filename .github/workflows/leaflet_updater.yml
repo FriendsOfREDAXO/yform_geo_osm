@@ -20,9 +20,9 @@ jobs:
         run: |
           LATEST_VERSION="${{ steps.get_version.outputs.version }}"
           echo "Downloading Leaflet version $LATEST_VERSION..."
-          curl -L "https://github.com/Leaflet/Leaflet/releases/download/${LATEST_VERSION}/leaflet-${LATEST_VERSION}.zip" -o leaflet.zip
+          curl -L "https://github.com/Leaflet/Leaflet/releases/latest/download/leaflet.zip" -o leaflet.zip
           unzip leaflet.zip
-          
+
       - name: Remove Old Leaflet Directory
         run: |
           if [ -d "assets/leaflet" ]; then
@@ -32,7 +32,7 @@ jobs:
 
       - name: Move Leaflet Files
         run: |
-          mv leaflet/dist assets/leaflet
+          mv dist assets/leaflet
 
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v4
