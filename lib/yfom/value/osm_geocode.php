@@ -6,17 +6,49 @@ use rex_yform_value_abstract;
 
 use function sprintf;
 
+/**
+ * YForm value field for OpenStreetMap integration.
+ * 
+ * This class provides a map field for YForm with geocoding capabilities.
+ * It allows to select coordinates via map interface and can handle both
+ * separate lat/lng fields and combined coordinate storage.
+ * 
+ * @package redaxo\yform\geo-osm
+ * @author Friends Of REDAXO
+ */
 class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 {
+    /**
+     * Reference to the latitude field
+     * @var rex_yform_value_abstract|null
+     */
     protected ?rex_yform_value_abstract $latField = null;
+
+    /**
+     * Reference to the longitude field
+     * @var rex_yform_value_abstract|null
+     */
     protected ?rex_yform_value_abstract $lngField = null;
+
+    /**
+     * Whether to store coordinates as combined value
+     * @var bool
+     */
     protected bool $combinedValue = false;
+
+    /**
+     * Reference to the input field for validation
+     * @var rex_yform_value_abstract|null
+     */
     protected ?rex_yform_value_abstract $latLngInput = null;
 
     /**
      * Die Hilfsfelder im Formular für Lat/Lng identifizieren.
      * Falls es reine Hilfsfelder sind (no_db) werden die Felder
      * beim ersten Aufruf vorbefüllt mit den Daten aus diesem Feld.
+     *
+     * @throws rex_functional_exception
+     * @return void
      */
     public function preValidateAction(): void
     {
@@ -50,7 +82,10 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     }
 
     /**
-     * HTML für das Feld generieren und Daten ggf. speichern
+     * Generates HTML for the field and saves data if necessary.
+     * Handles both legacy attributes and new map_attributes configuration.
+     *
+     * @return void
      */
     public function enterObject(): void
     {
@@ -110,11 +145,22 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         }
     }
 
+    /**
+     * Returns the description string for this field type.
+     *
+     * @return string
+     */
     public function getDescription(): string
     {
         return 'osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|class|[mapbox_token]|[no_db]|[map_attributes]';
     }
 
+    /**
+     * Returns the field definitions including validation rules.
+     * This defines the field structure and behavior in YForm.
+     *
+     * @return array<string, mixed>
+     */
     public function getDefinitions(): array
     {
         return [
@@ -126,7 +172,11 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                 'latlng' => [
                     'type' => 'text',
                     'label' => 'Koordinaten-Felder',
-                    'notice' => 'Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»'
+                    'notice' => 'Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»',
+                    'validate' => [
+                        ['type' => 'not_empty', 'message' => 'Bitte Koordinaten-Felder angeben.'],
+                        ['type' => 'preg_match', 'pattern' => '/^[a-zA-Z0-9_]+,[a-zA-Z0-9_]+$/', 'message' => 'Bitte genau zwei Felder durch Komma getrennt angeben.']
+                    ]
                 ],
                 'address' => [
                     'type' => 'text',
@@ -157,124 +207,83 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             ],
             'validates' => [
                 [
-                    'type' => 'customfunction',
+                    'type' => 'custom',
                     'name' => 'latlng',
-                    'message' => 'Bitte genau zwei Felder für Breiten- und Längengrade (lat, lng) angeben.',
-                    'function' => static function (string $field_name, string $value, $options) {
-                        // Eingabe in ein Array auflösen und formal bereinigen
-                        $coord_field_names = array_map(trim(...), explode(',', $value));
-                        $coord_field_names = array_filter($coord_field_names, strlen(...));
-                        $coord_field_names = array_unique($coord_field_names);
+                    'message' => 'Die angegebenen Koordinaten-Felder existieren nicht in der Tabelle.',
+                    'parameters' => [
+                        'function' => static function($values) {
+                            $value = $values['value'];
+                            $coord_field_names = array_map(trim(...), explode(',', $value));
+                            $coord_field_names = array_filter($coord_field_names, strlen(...));
+                            
+                            // Liste der Feldnamen in der Tabelle abrufen
+                            $sql = rex_sql::factory();
+                            $field_list = $sql->getArray(
+                                'SELECT name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
+                                [
+                                    ':ti' => 'value',
+                                    ':tn' => $values['this']->getParam('main_table')
+                                ]
+                            );
+                            $field_list = array_column($field_list, 'name');
 
-                        // Fehler 1: mehr oder weniger als zwei Felder angegeben
-                        if (2 !== count($coord_field_names)) {
+                            // Prüfen ob alle Felder existieren
+                            foreach ($coord_field_names as $field) {
+                                if (!in_array($field, $field_list)) {
+                                    return false;
+                                }
+                            }
                             return true;
                         }
-
-                        // Liste der Feldnamen in der Tabelle abrufen
-                        $sql = rex_sql::factory();
-                        $field_list = $sql->getArray(
-                            'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
-                            [
-                                ':ti' => 'value',
-                                ':tn' => $options['this']->getParam('main_table'),
-                            ],
-                            PDO::FETCH_KEY_PAIR,
-                        );
-
-                        // Fehler 2: unbekanntes Feld
-                        $unknown_fields = array_diff($coord_field_names, array_values($field_list));
-                        return 0 < count($unknown_fields);
-                    }
+                    ]
                 ],
                 [
-                    'type' => 'customfunction',
-                    'name' => ['height', 'format', 'map_attributes'],
-                    'message' => 'Bitte nur die Map-H&ouml;he oder die CSS-Klasse angeben oder map_attributes verwenden.',
-                    'function' => static function (array $field_names, array $values, $options) {
-                        // Validate map_attributes JSON if present
-                        if (!empty($values['map_attributes'])) {
+                    'type' => 'custom',
+                    'name' => 'map_attributes',
+                    'message' => 'Ungültiges JSON-Format für Map Attribute.',
+                    'parameters' => [
+                        'function' => static function($values) {
+                            $value = $values['value'];
+                            if (empty($value)) {
+                                return true;
+                            }
                             try {
-                                $attributes = json_decode($values['map_attributes'], true, 512, JSON_THROW_ON_ERROR);
-                                if (!is_array($attributes)) {
-                                    return true;
-                                }
+                                $attributes = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                                return is_array($attributes);
                             } catch (\JsonException $e) {
-                                return true;
+                                return false;
                             }
                         }
-
-                        // Only validate legacy fields if map_attributes is not set
-                        if (empty($values['map_attributes'])) {
-                            if (!empty($values['height']) && !empty($values['format'])) {
-                                return true;
-                            }
-
-                            if (!empty($values['height'])) {
-                                if (!preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@', $values['height'])) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    }
+                    ]
                 ],
                 [
-                    'type' => 'customfunction',
-                    'name' => 'address',
-                    'message' => 'Adress-Felder konnten nicht gefunden werden.',
-                    'function' => static function (string $field_name, string $value, $options) {
-                        if (empty(trim($value))) {
-                            return false;
+                    'type' => 'custom',
+                    'name' => 'format_height',
+                    'message' => 'Es kann entweder nur die Map-Höhe oder nur die CSS-Klasse verwendet werden.',
+                    'parameters' => [
+                        'function' => static function($values) {
+                            $height = $values['this']->getElement('height');
+                            $format = $values['this']->getElement('format');
+                            $mapAttributes = $values['this']->getElement('map_attributes');
+
+                            // Wenn map_attributes gesetzt ist, ignoriere die Legacy-Felder
+                            if (!empty($mapAttributes)) {
+                                return true;
+                            }
+
+                            // Beide Legacy-Felder sind gesetzt
+                            if (!empty($height) && !empty($format)) {
+                                return false;
+                            }
+
+                            // Prüfe Höhenformat wenn gesetzt
+                            if (!empty($height)) {
+                                return preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@', $height);
+                            }
+
+                            return true;
                         }
-                        
-                        // Eingabe in ein Array auflösen und formal bereinigen
-                        $address_field_names = array_map(trim(...), explode(',', $value));
-                        $address_field_names = array_filter($address_field_names, strlen(...));
-                        $address_field_names = array_unique($address_field_names);
-
-                        // Liste der Feldnamen in der Tabelle abrufen
-                        $sql = rex_sql::factory();
-                        $field_list = $sql->getArray(
-                            'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE type_id = :ti AND table_name = :tn',
-                            [
-                                ':ti' => 'value',
-                                ':tn' => $options['this']->getParam('main_table'),
-                            ],
-                            PDO::FETCH_KEY_PAIR,
-                        );
-
-                        // Fehler: unbekanntes Feld
-                        $unknown_fields = array_diff($address_field_names, array_values($field_list));
-                        return 0 < count($unknown_fields);
-                    }
-                ],
-                [
-                    'type' => 'customfunction',
-                    'name' => 'no_db',
-                    'message' => rex_i18n::msg('yform_values_options_name'),
-                    'function' => static function (?int $field_name, ?int $value, $options) {
-                        if ($value === null || $value === 0) {
-                            return false;
-                        }
-
-                        $fields = explode(',', $options['this']->getElement('latlng'));
-                        $sql = rex_sql::factory();
-                        $result = $sql->getArray(
-                            'SELECT id,name FROM ' . rex::getTable('yform_field') . ' WHERE table_name = :tn AND type_id = :ti AND (name = :lat OR name = :lng) AND no_db = :no',
-                            [
-                                ':tn' => $options['this']->getParam('main_table'),
-                                ':ti' => 'value',
-                                ':lat' => $fields[0],
-                                ':lng' => $fields[1],
-                                ':no' => 1,
-                            ],
-                            PDO::FETCH_KEY_PAIR,
-                        );
-
-                        return 0 !== count($result);
-                    }
+                    ]
                 ]
             ],
             'description' => '🧩 yform_geo_osm: OpenStreetMap-Karte und Geoocodierung',
