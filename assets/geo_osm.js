@@ -44,13 +44,37 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
             }
         }
 
-        var layer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // Base layer (OpenStreetMap)
+        var osmLayer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
         });
 
+        // Setup basemaps
+        var baseMaps = {
+            "OpenStreetMap": osmLayer
+        };
+
+        // Initialize map with OSM layer
         if (!map) {
+            // If mapbox token is provided, add mapbox layers
+            if (mapbox_token) {
+                baseMaps["Mapbox Streets"] = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapbox_token, {
+                    id: 'mapbox/streets-v11',
+                    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
+                });
+                baseMaps["Mapbox Satellite"] = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapbox_token, {
+                    id: 'mapbox/satellite-v9',
+                    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
+                });
+            }
+
             map = L.map('map-' + id, options);
-            layer.addTo(map);
+            osmLayer.addTo(map);
+
+            // Add layer control if mapbox is available
+            if (mapbox_token) {
+                L.control.layers(baseMaps).addTo(map);
+            }
 
             // Ensure zoom is within bounds after initialization
             if (options.maxZoom && map.getZoom() > options.maxZoom) {
