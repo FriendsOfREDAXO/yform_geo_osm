@@ -30,27 +30,27 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
 <div class="yform-geocoding-wrapper">
     <div class="rex-geo-search-wrapper">
         <label class="<?= $class_label ?>"><?= $this->getElement('label') ?></label>
-        <input type="text" 
-               class="rex-geo-search-input" 
-               id="rex-geo-search-input-<?= $fieldId ?>" 
-               placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>" 
+        <input type="text"
+               class="rex-geo-search-input"
+               id="rex-geo-search-input-<?= $fieldId ?>"
+               placeholder="<?= rex_i18n::msg('yform_geo_osm_search_placeholder') ?>"
                autocomplete="off">
         <div id="rex-geo-search-results-<?= $fieldId ?>" class="rex-geo-search-results"></div>
     </div>
 
     <div class="btn-group">
-        <button type="button" 
-                class="btn btn-primary search" 
+        <button type="button"
+                class="btn btn-primary search"
                 id="search-geo-<?= $fieldId ?>">
             <i class="fa-solid fa-magnifying-glass"></i>  <?= rex_i18n::msg('yform_geo_osm_search_address') ?>
         </button>
-        <button type="button" 
-                class="btn btn-primary browser-location" 
+        <button type="button"
+                class="btn btn-primary browser-location"
                 id="browser-geo-<?= $fieldId ?>">
             <i class="fa-solid fa-location-crosshairs"></i>  <?= rex_i18n::msg('yform_geo_osm_get_location') ?>
         </button>
-        <button type="button" 
-                class="btn btn-default map-center" 
+        <button type="button"
+                class="btn btn-default map-center"
                 id="center-geo-<?= $fieldId ?>">
             <i class="fa-solid fa-arrows-to-circle"></i> <?= rex_i18n::msg('yform_geo_osm_center_map') ?>
         </button>
