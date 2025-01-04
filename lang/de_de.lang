@@ -12,7 +12,7 @@ osm_geocode_map_attributes_label = Map Attribute (JSON)
 osm_geocode_map_attributes_notice = JSON-Objekt mit HTML-Attributen für die Karte, z.B.: {"style": "height: 400px", "data-max-zoom": "12"}
 osm_geocode_mapbox_token_label = Mapbox-Token
 osm_geocode_mapbox_token_notice = (optional)
-osm_geocode_description = osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[mapbox_token]|[no_db]|[map_attributes]
+osm_geocode_description = osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[map_attributes]|[mapbox_token]|[no_db]
 osm_geocode_description_full = 🧩 yform_geo_osm: OpenStreetMap-Karte und Geoocodierung
 
 osm_geocode_config_error = Konfigurationsfehler im Feld %s: lat/lng
