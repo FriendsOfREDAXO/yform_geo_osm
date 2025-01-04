@@ -108,7 +108,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             }
         }
 
-        // Legacy support for height 
+        // Legacy support for height
         $height = $this->getElement('height');
         if (empty($mapAttributes) && $height) {
             $height = is_numeric($height) ? $height . 'px' : $height;
@@ -189,11 +189,46 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         ];
 
         $this->params['validates'][] = [
+            'type' => 'empty',
+            'name' => 'latlng',
+            'message' => 'Bitte Koordinaten-Felder angeben.'
+        ];
+
+        $this->params['validates'][] = [
             'type' => 'preg_match',
             'name' => 'latlng',
             'message' => 'Bitte genau zwei Felder durch Komma getrennt angeben.',
             'pattern' => '/^[a-zA-Z0-9_]+,[a-zA-Z0-9_]+$/',
             'not_required' => false
+        ];
+
+        $this->params['validates'][] = [
+            'type' => 'custom',
+            'name' => ['map_attributes', 'height'],
+            'message' => 'Ungültiges JSON-Format oder ungültige Höhenangabe.',
+            'validate' => function($value, $element) {
+                // Prüfen der map_attributes, wenn vorhanden
+                if ($element['name'] === 'map_attributes' && !empty($value)) {
+                    try {
+                        $attributes = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                        if (!is_array($attributes)) {
+                            return false;
+                        }
+                    } catch (\JsonException $e) {
+                        return false;
+                    }
+                }
+
+                // Prüfen der height, wenn map_attributes nicht gesetzt ist
+                $mapAttributes = $this->getElement('map_attributes');
+                if (empty($mapAttributes) && $element['name'] === 'height' && !empty($value)) {
+                    if (!preg_match('@^(?<height>[1-9]\d*)\s*(?<unit>px|em|rem|vh)?$@', $value)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         ];
 
         $this->params['validates'][] = [
@@ -221,23 +256,6 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
                     }
                 }
                 return true;
-            }
-        ];
-
-        $this->params['validates'][] = [
-            'type' => 'custom',
-            'name' => 'map_attributes',
-            'message' => 'Ungültiges JSON-Format für Map Attribute.',
-            'validate' => function($value) {
-                if (empty($value)) {
-                    return true;
-                }
-                try {
-                    $attributes = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-                    return is_array($attributes);
-                } catch (\JsonException $e) {
-                    return false;
-                }
             }
         ];
 
