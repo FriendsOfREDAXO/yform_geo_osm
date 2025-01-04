@@ -219,7 +219,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         if (0 < count($unknown_fields)) {
             $self->setElement(
                 'message',
-                rex_i18n::msg('osm_geocode_validate_latlng_unknown', implode('», «', $unknown_fields))
+                sprintf(rex_i18n::msg('osm_geocode_validate_latlng_unknown'), implode('», «', $unknown_fields))
             );
             return true;
         }
@@ -264,7 +264,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         if (0 < count($unknown_fields)) {
             $self->setElement(
                 'message',
-               rex_i18n::msg('osm_geocode_validate_address_unknown', implode('», «', $unknown_fields))
+               sprintf(rex_i18n::msg('osm_geocode_validate_address_unknown'), implode('», «', $unknown_fields))
             );
             return true;
         }
@@ -307,9 +307,11 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         if (0 !== count($result)) {
             $self->setElement(
                 'message',
-                 rex_i18n::msg(
-                     'osm_geocode_validate_nodb_conflict',
-                     rex_i18n::msg('yform_donotsaveindb'),
+                 sprintf(
+                     rex_i18n::msg(
+                         'osm_geocode_validate_nodb_conflict',
+                         rex_i18n::msg('yform_donotsaveindb')
+                     ),
                     implode('» bzw. «', $result),
                     implode('», «', $coord_fields)
                     )
@@ -348,7 +350,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
             } catch (\JsonException $e) {
                 $self->setElement(
                     'message',
-                    rex_i18n::msg('osm_geocode_validate_map_attributes_json_error', $e->getMessage())
+                    sprintf(rex_i18n::msg('osm_geocode_validate_map_attributes_json_error'), $e->getMessage())
                 );
                 return true;
             }
@@ -367,7 +369,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         if (0 === $ok) {
             $self->setElement(
                 'message',
-                rex_i18n::msg('osm_geocode_validate_height_invalid', $height)
+                 sprintf(rex_i18n::msg('osm_geocode_validate_height_invalid'), $height)
             );
             return true;
         }
