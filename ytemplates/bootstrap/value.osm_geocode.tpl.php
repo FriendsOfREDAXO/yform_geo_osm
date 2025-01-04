@@ -39,17 +39,17 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
 
     <div class="btn-group">
         <button type="button" 
-                class="btn btn-default" 
+                class="btn btn-primary search" 
                 id="search-geo-<?= $fieldId ?>">
             <?= rex_i18n::msg('yform_geo_osm_search_address') ?>
         </button>
         <button type="button" 
-                class="btn btn-default" 
+                class="btn btn-primary browser-location" 
                 id="browser-geo-<?= $fieldId ?>">
             <?= rex_i18n::msg('yform_geo_osm_get_location') ?>
         </button>
         <button type="button" 
-                class="btn btn-default" 
+                class="btn btn-default map-center" 
                 id="center-geo-<?= $fieldId ?>">
             <?= rex_i18n::msg('yform_geo_osm_center_map') ?>
         </button>
