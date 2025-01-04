@@ -29,6 +29,7 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
 
 <div class="yform-geocoding-wrapper">
     <div class="rex-geo-search-wrapper">
+        <label class="<?= $class_label ?>"><?= $this->getElement('label') ?></label>
         <input type="text" 
                class="rex-geo-search-input" 
                id="rex-geo-search-input-<?= $fieldId ?>" 
