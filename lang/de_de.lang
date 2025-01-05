@@ -3,13 +3,13 @@ osm_geocode = OpenStreetMap Geokodierung
 osm_geocode_name = Name
 osm_geocode_label = Bezeichnung
 osm_geocode_latlng_label = Koordinaten-Felder
-osm_geocode_latlng_notice = Namen der Felder für Breitengrad/Latitude und Längengrad/Longitude; Bsp.: «pos_lat,pos_lng»
-osm_geocode_address_label = Adressen-Felder
-osm_geocode_address_notice = Namen der Felder mit Adressen-Elementen zur Positionsfindung; Bsp.: «strasse,plz,ort»
-osm_geocode_height_label = Map-Höhe
-osm_geocode_height_notice = Angabe als Integer-Zahl ggf, mit Masseinheit px(default) | em | rem | vh. Wird ignoriert wenn map_attributes gesetzt sind.
-osm_geocode_map_attributes_label = Map Attribute (JSON)
-osm_geocode_map_attributes_notice = JSON-Objekt mit HTML-Attributen für die Karte, z.B.: {"style": "height: 400px", "data-max-zoom": "12"}
+osm_geocode_latlng_notice = Feldnamen für Breitengrad (Latitude) und Längengrad (Longitude), z.B.: <code>pos_lat,pos_lng</code>
+osm_geocode_address_label = Adress-Felder
+osm_geocode_address_notice = Feldnamen, die die Adresse enthalten, bspw.: <code>street,zip,locality</code>
+osm_geocode_height_label = Karten-Höhe
+osm_geocode_height_notice = z.B. <code>400px</code>. Wird ignoriert, wenn Karten-Attribute direkt gesetzt sind.
+osm_geocode_map_attributes_label = Attribute (Karte, JSON)
+osm_geocode_map_attributes_notice = JSON-Objekt mit HTML-Attributen für die Karte, z.B.: <code>{"style": "height: 400px", "data-max-zoom": "12"}</code>
 osm_geocode_mapbox_token_label = Mapbox-Token
 osm_geocode_mapbox_token_notice = (optional)
 osm_geocode_description = osm_geocode|osmgeocode|Bezeichnung|pos_lat,pos_lng|strasse,plz,ort|height|[map_attributes]|[mapbox_token]|[no_db]
@@ -19,12 +19,12 @@ osm_geocode_config_error = Konfigurationsfehler im Feld %s: lat/lng
 osm_geocode_validate_latlng_count = Bitte genau zwei Felder für Breiten- und Längengrade (lat, lng) angeben.
 osm_geocode_validate_latlng_unknown = Koordinaten-Feld unbekannt: «%s»
 osm_geocode_validate_address_unknown = Adress-Feld unbekannt: «%s»
-osm_geocode_validate_nodb_conflict = "%s" kollidiert mit der Feldkonfiguration von «%s»; Beide Koordinatenfelder («%s») müssen speicherbar sein, wenn dieses Feld nicht speicherbar ist
+osm_geocode_validate_nodb_conflict = "%s" kollidiert mit der Feldkonfiguration von «%s»; Beide Koordinatenfelder («%s») müssen speicherbar sein, wenn dieses Feld nicht speicherbar ist.
 osm_geocode_validate_map_attributes_invalid = Map Attribute müssen ein valides JSON-Objekt sein.
 osm_geocode_validate_map_attributes_json_error = Ungültiges JSON Format für Map Attribute: %s
-osm_geocode_validate_height_invalid = Ungültige Höhenangabe «%s»; bitte nur eine Integer-Zahl sowie eine der zulässigen Masseinheiten eingeben
+osm_geocode_validate_height_invalid = Ungültige Höhenangabe «%s»; bitte nur eine Ganzzahl sowie eine der zulässigen Maßeinheiten eingeben.
 
-yform_donotsaveindb = Darf nicht in der Datenbank gespeichert werden
+yform_donotsaveindb = Darf nicht in der Datenbank gespeichert werden.
 
 # Zusätzliche Strings
 yform_geo_osm = Geo (OSM)
