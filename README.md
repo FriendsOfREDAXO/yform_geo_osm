@@ -106,7 +106,7 @@ $geo = new Search(
 $results = $geo->searchByPostalcode('12345', 50);
 ```
 
-### YForm Integration
+### YForm-Integration
 
 #### Beispielmodul für YForm Frontend
 
@@ -227,9 +227,13 @@ MIT-Lizenz, siehe [LICENSE](LICENSE)
 
 **Project Lead**
 
-[NGWNGW](https://github.com/NGWNGW)
+[Alexander Walther](https://github.com/alxndr-w)
 
-**Weitere Credits**
+**Weitere Autoren (2.x)** 
+[Thomas Skerbis](https://github.com/skerbis)
+[Christoph Böcker](https://github.com/christophboecker)
+
+**Weitere Credits (1.x)**
 
 * Polarpixel – Peter Bickel (Testing / Ideen)
 * Wolfgang Bund – Massencodierung
