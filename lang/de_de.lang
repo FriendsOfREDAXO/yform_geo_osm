@@ -35,3 +35,11 @@ yform_geo_osm_search = Suchen
 yform_geo_osm_search_placeholder = Adresse eingeben...
 yform_geo_osm_no_data = Keine Koordinaten vorhanden. Bitte suchen Sie nach einer Adresse oder setzen Sie die Position manuell.
 yform_geo_osm_center_map = Karte zentrieren
+
+# Backend-Seite
+
+yform_geo_osm.batch_geocoding = Batch-Geokodierung
+yform_geo_osm.batch_geocoding.title = Batch-Geokodierung (yform_geo_osm)
+yform_geo_osm.help = Hilfe
+yform_geo_osm.changelog = Changelog
+yform_geo_osm.license = Lizenz
