@@ -230,8 +230,9 @@ MIT-Lizenz, siehe [LICENSE](LICENSE)
 [Alexander Walther](https://github.com/alxndr-w)
 
 **Weitere Autoren (2.x)** 
-[Thomas Skerbis](https://github.com/skerbis)
-[Christoph Böcker](https://github.com/christophboecker)
+
+* [Thomas Skerbis](https://github.com/skerbis)
+* [Christoph Böcker](https://github.com/christophboecker)
 
 **Weitere Credits (1.x)**
 
