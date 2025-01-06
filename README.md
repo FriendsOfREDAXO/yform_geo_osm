@@ -18,7 +18,7 @@
 * Optional: Mapbox-Token für zusätzliche Kartenebenen (Layer)
 * Optional: Geoapify API-Key für erweiterte Geocoding-Funktionen
 
-> Hinweis: `yform_geo_osm` kann an den entsprechenden Tabellen 2 Felder für die Koordinaten `lat` und `lng` verwenden. Die optimalen Felder sind ein YForm-Number-Feld `DECIMAL(10,8)` für Latitude und `DECIMAL(11,8) für Longitude. Oder verwende <https://github.com/alexplusde/yform_field> für zwei vorgefertigte Felder `number_lat` und `number_lng`.
+> Hinweis: `yform_geo_osm` kann an den entsprechenden Tabellen 2 Felder für die Koordinaten `lat` und `lng` verwenden. Die optimalen Felder sind ein YForm-Number-Feld `DECIMAL(10,8)` für Latitude und `DECIMAL(11,8)` für Longitude. Oder verwende <https://github.com/alexplusde/yform_field> für zwei vorgefertigte Felder `number_lat` und `number_lng`.
 
 ## Features
 
