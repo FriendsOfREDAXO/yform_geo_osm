@@ -18,6 +18,8 @@
 * Optional: Mapbox-Token für zusätzliche Kartenebenen (Layer)
 * Optional: Geoapify API-Key für erweiterte Geocoding-Funktionen
 
+> Hinweis: `yform_geo_osm` kann an den entsprechenden Tabellen 2 Felder für die Koordinaten `lat` und `lng` verwenden. Die optimalen Felder sind ein YForm-Number-Feld `DECIMAL(10,8)` für Latitude und `DECIMAL(11,8) für Longitude. Oder verwende <https://github.com/alexplusde/yform_field> für zwei vorgefertigte Felder `number_lat` und `number_lng`.
+
 ## Features
 
 ### YForm-Feld `osm_geocode`
@@ -123,7 +125,7 @@ $yform->setObjectparams('real_field_names', true);
 $yform->setValueField('text', ['street','Straße','','0']);
 $yform->setValueField('text', ['postalcode','PLZ','','0']);
 $yform->setValueField('text', ['city','Ort','','0']);
-$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
+$yform->setValueField('number', ['lat','LAT','10','8','','0','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
 $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
 
@@ -136,7 +138,7 @@ werden. Dazu wird für den jeweils nicht benötigen Teil "Nicht in Datenbank spe
 *Beispiel 1: Koordinaten als Einzelwerte `lat` bzw. `lng` speichern*
 
 ```php
-$yform->setValueField('number', ['lat','LAT','10','7','','0','input:text']);
+$yform->setValueField('number', ['lat','LAT','10','8','','0','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','0','input:text']);
 $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','1']);
 ```
@@ -144,7 +146,7 @@ $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,c
 *Beispiel 2: Koordinaten als Kombiwert (`lat,lng`) in `osm` speichern*
 
 ```php
-$yform->setValueField('number', ['lat','LAT','10','7','','1','input:text']);
+$yform->setValueField('number', ['lat','LAT','10','8','','1','input:text']);
 $yform->setValueField('number', ['lng','LNG','11','8','','1','input:text']);
 $yform->setValueField('osm_geocode', ['osm','OSM','lat,lng','street,postalcode,city','500','','','0']);
 ```
