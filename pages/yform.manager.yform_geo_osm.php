@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aus Codeschnippseln verschiedener Addons
  */
@@ -41,19 +42,19 @@ $sel_table->setSize(1);
 $sel_table->setAttribute('class', 'form-control');
 $sel_table->setSelected(rex_request('osm-geo-table', 'string', ''));
 
-foreach ($geo_tables as $gt=>$gtable) {
+foreach ($geo_tables as $gt => $gtable) {
     $sel_table->addOption($gt, $gt);
 }
 
 $content = '<p>Für die Geocodierung ist ein API Key von <a href="https://www.geoapify.com/" target="_blank">Geo Apify</a> notwendig. Stand 08/2020 ist der freie Account ausreichend, wenn ein Link ins Impressum gesetzt wird (siehe Bedingungen des Anbieters).</p>'
-        . '<p>Wähle eine Tabelle zur Geocodierung aus.</p>';
+    . '<p>Wähle eine Tabelle zur Geocodierung aus.</p>';
 
 $content .= '<fieldset>';
 
 
 $formElements = [];
 $n = [];
-$n['field'] = '<input type="text" value="'.$addon->getConfig('geoapifykey').'" name="geoapifykey" class="form-control">';
+$n['field'] = '<input type="text" value="' . $addon->getConfig('geoapifykey') . '" name="geoapifykey" class="form-control">';
 $n['label'] = '<label for="geoapifykey">Geo Apify key</label>';
 $formElements[] = $n;
 
@@ -85,9 +86,26 @@ $fragment->setVar('flush', true);
 $fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
+$buttonlist = '';
+
+// Links zu Backend-Seiten
+$help_url = \rex_url::backendPage('packages', ["subpage" => "help", "package" => "yform_geo_osm"]);
+$changelog_url = \rex_url::backendPage('packages', ["subpage" => "changelog", "package" => "yform_geo_osm"]);
+$license_url = \rex_url::backendPage('packages', ["subpage" => "license", "package" => "yform_geo_osm"]);
+
+$buttonlist = '<div class="btn-group" role="group">
+	<a href="'. $help_url .'"
+		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.help') .'</a>
+	<a href="'. $changelog_url .'"
+		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.changelog') .'</a>
+	<a href="'. $license_url .'"
+		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.license') .'</a>
+</div>';
+
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit');
-$fragment->setVar('title', 'OSM Geocodierung');
+$fragment->setVar('title', $addon->i18n("yform_geo_osm.batch_geocoding.title"));
+$fragment->setVar('options', $buttonlist, false);
 $fragment->setVar('body', $content, false);
 $fragment->setVar('buttons', $buttons, false);
 $content = $fragment->parse('core/page/section.php');
@@ -102,10 +120,10 @@ if ($table) {
     $content = '';
     $func = rex_request('geo_func', 'string');
     $field = rex_request('geo_field', 'string');
-    
+
     $geo_sql = \rex_sql::factory();
     //    $geo_sql->setDebug();
-    
+
     if ($func === 'get_data') {
         $data = [];
         ob_end_clean();
@@ -130,10 +148,10 @@ if ($table) {
             }
         }
         echo json_encode($data);
-        
+
         exit;
     }
-    
+
     if ($func === 'save_data') {
         ob_end_clean();
         $data = '0';
@@ -161,7 +179,7 @@ if ($table) {
                 $gd = \rex_sql::factory();
                 $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . (string) $gd->escape($data_id));
                 if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
-                    $geopos = $data_lat.','.$data_lng;
+                    $geopos = $data_lat . ',' . $data_lng;
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
                     $sd->setWhere('id=' . $data_id);
@@ -174,18 +192,16 @@ if ($table) {
         echo $data;
         exit;
     }
-    
+
     foreach ($fields as $k => $v) {
         $content .= '<p><a class="btn btn-setup" href="javascript:osm_geo_updates(\'' . $table['table_name'] . '\',\'' . $k . '\')">Google Geotagging starten</a> &nbsp;Hiermit werden alle Datensätze anhand des Felder "' . $k . '" nach fehlenden Geopositionen durchsucht und neu gesetzt.</p>'
-                . '<div class="status_output" id="osm_geo_count_' . $k . '"></div>';
+            . '<div class="status_output" id="osm_geo_count_' . $k . '"></div>';
     }
-    
+
     $content .= '</fieldset>';
-    
+
     echo $content;
-
 }
-
 ?>
 
 <script type="text/javascript">

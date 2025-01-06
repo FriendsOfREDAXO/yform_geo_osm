@@ -10,13 +10,9 @@ requires:
     php:
         version: '>=8.0, <9'
 
-page:
-    title: 'Geo OSM'
-    hidden: true
-
 pages:
-    yform/yform_geo_osm:
-        title: 'Geo OSM'
+    yform/manager/yform_geo_osm:
+        title: 'translate:yform_geo_osm.batch_geocoding'
         perm: admin[]
         icon: rex-icon fa-map-location-dot
 
