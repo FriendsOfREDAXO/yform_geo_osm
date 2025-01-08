@@ -7,15 +7,16 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
     var $overlay = $('#rex-geo-overlay-' + id);
     var hasCoordinates = $lat.val() && $lng.val();
     var mapElement = document.getElementById('map-' + id);
+    var updateTimeout; // Für verzögerte Kartenaktualisierungen
 
-    // Apply map attributes if provided
+    // Map-Attribute anwenden, falls vorhanden
     if (mapAttributes && typeof mapAttributes === 'object') {
         Object.keys(mapAttributes).forEach(function(attr) {
             mapElement.setAttribute(attr, mapAttributes[attr]);
         });
     }
 
-    // Initialize overlay
+    // Overlay initialisieren
     if (!hasCoordinates) {
         $overlay.show();
     } else {
@@ -23,15 +24,34 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
         createMap(parseFloat($lat.val()), parseFloat($lng.val()));
     }
 
+    // Input-Handler für lat/lng Felder hinzufügen
+    $lat.on('input', handleCoordinateInput);
+    $lng.on('input', handleCoordinateInput);
+
+    function handleCoordinateInput() {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(function() {
+            var newLat = parseFloat($lat.val());
+            var newLng = parseFloat($lng.val());
+            
+            // Überprüfen, ob die Eingaben gültige Zahlen sind
+            if (!isNaN(newLat) && !isNaN(newLng) &&
+                newLat >= -90 && newLat <= 90 &&
+                newLng >= -180 && newLng <= 180) {
+                createMap(newLat, newLng);
+            }
+        }, 500); // 500ms Verzögerung vor der Kartenaktualisierung
+    }
+
     function createMap(lat, lng) {
-        // Default map options
+        // Standard Map-Optionen
         var options = {
             gestureHandling: true,
             center: [lat, lng],
             zoom: 16
         };
 
-        // Get zoom limits from data attributes if available
+        // Zoom-Grenzen aus data-Attributen auslesen, falls verfügbar
         if (mapElement) {
             var maxZoom = mapElement.getAttribute('data-max-zoom');
             var minZoom = mapElement.getAttribute('data-min-zoom');
@@ -49,14 +69,14 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
             attribution: 'Map data &copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
         });
 
-        // Setup basemaps
+        // Basemaps Setup
         var baseMaps = {
             "OpenStreetMap": osmLayer
         };
 
-        // Initialize map with OSM layer
+        // Map mit OSM Layer initialisieren
         if (!map) {
-            // If mapbox token is provided, add mapbox layers
+            // Wenn Mapbox-Token vorhanden ist, Mapbox-Layer hinzufügen
             if (mapbox_token) {
                 baseMaps["Mapbox Streets"] = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapbox_token, {
                     id: 'mapbox/streets-v11',
@@ -71,12 +91,12 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
             map = L.map('map-' + id, options);
             osmLayer.addTo(map);
 
-            // Add layer control if mapbox is available
+            // Layer-Control hinzufügen, wenn Mapbox verfügbar ist
             if (mapbox_token) {
                 L.control.layers(baseMaps).addTo(map);
             }
 
-            // Ensure zoom is within bounds after initialization
+            // Sicherstellen, dass der Zoom innerhalb der Grenzen liegt
             if (options.maxZoom && map.getZoom() > options.maxZoom) {
                 map.setZoom(options.maxZoom);
             }
@@ -99,7 +119,7 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
             marker.setLatLng([lat, lng]);
         }
 
-        // Add touch gesture handling
+        // Touch-Gesten-Handling hinzufügen
         if (L.Browser.touch) {
             map.dragging.enable();
             map.touchZoom.enable();
@@ -202,7 +222,7 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
         }
     });
 
-    // Improved touch handling for search results
+    // Verbessertes Touch-Handling für Suchergebnisse
     var touchStartY;
     $searchResults.on('touchstart', function(e) {
         touchStartY = e.originalEvent.touches[0].clientY;
@@ -214,20 +234,20 @@ var rex_geo_osm = function (addressfields, geofields, id, mapbox_token, mapAttri
         var scrollHeight = $searchResults[0].scrollHeight;
         var offsetHeight = $searchResults[0].offsetHeight;
 
-        // Allow scrolling only when content is scrollable
+        // Scrollen nur erlauben, wenn Inhalt scrollbar ist
         if (scrollHeight > offsetHeight) {
             if (scrollTop === 0 && touchY > touchStartY) {
-                e.preventDefault(); // Prevent pull-to-refresh at top
+                e.preventDefault(); // Pull-to-refresh am Anfang verhindern
             }
             if (scrollTop + offsetHeight >= scrollHeight && touchY < touchStartY) {
-                e.preventDefault(); // Prevent overscroll at bottom
+                e.preventDefault(); // Überscroll am Ende verhindern
             }
         } else {
-            e.preventDefault(); // Prevent scrolling when content fits
+            e.preventDefault(); // Scrollen verhindern, wenn Inhalt passt
         }
     });
 
-    // Close search results when clicking outside
+    // Suchergebnisse schließen beim Klicken außerhalb
     $(document).on('click touchend', function (e) {
         if (!$(e.target).closest('.rex-geo-search-wrapper').length) {
             $searchResults.removeClass('active');
