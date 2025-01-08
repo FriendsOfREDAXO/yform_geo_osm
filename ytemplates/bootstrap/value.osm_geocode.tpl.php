@@ -25,6 +25,9 @@ if (!empty($mapAttributes) && is_array($mapAttributes)) {
         $htmlAttributes .= ' ' . rex_escape($attr) . '="' . rex_escape($value) . '"';
     }
 }
+
+$class_label = 'control-label';
+
 ?>
 
 <div class="yform-geocoding-wrapper">
