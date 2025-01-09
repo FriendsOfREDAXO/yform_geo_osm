@@ -4,7 +4,7 @@
  * @var array<rex_yform_value_abstract> $geofields
  * @var array<string, string> $mapAttributes
  * @var string|null $mapbox_token
- * 
+ *
  * @var rex_yform_value_osm_geocode $this
  */
 
@@ -67,7 +67,7 @@ $class_label = 'control-label';
             </div>
         </div>
         </div>
-        
+
     </div>
 </div>
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         '<?= $fieldId ?>',
         <?= null !== $mapbox_token ? json_encode($mapbox_token) : 'null' ?>,
-        <?= count($mapAttributes) === 0 ? json_encode($mapAttributes) : 'null' ?>
+        <?= 0 === count($mapAttributes) ? json_encode($mapAttributes) : 'null' ?>
     );
 });
 </script>
