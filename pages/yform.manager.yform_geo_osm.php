@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Aus Codeschnippseln verschiedener Addons
+ * Aus Codeschnippseln verschiedener Addons.
  */
 
 namespace FriendsOfREDAXO\YFormGeoOSM;
@@ -16,7 +16,7 @@ $geosql = \rex_sql::factory();
 $table = null;
 $addon = \rex_addon::get('yform_geo_osm');
 
-if (rex_request('config-submit', 'int', 0) === 1) {
+if (1 === rex_request('config-submit', 'int', 0)) {
     $addon->setConfig('geoapifykey', rex_request('geoapifykey', 'string'));
 }
 
@@ -25,7 +25,7 @@ $geo_tables = [];
 $fields = [];
 foreach ($tables as $i_table) {
     $fields = $i_table->getValueFields(['type_name' => 'osm_geocode']);
-    if (count($fields) > 0) {
+    if (\count($fields) > 0) {
         $geo_tables[$i_table->getTableName()] = $i_table;
         if ($table_name === $i_table->getTableName()) {
             $table = $i_table;
@@ -33,7 +33,6 @@ foreach ($tables as $i_table) {
         }
     }
 }
-
 
 $sel_table = new \rex_select();
 $sel_table->setId('osm-geo-table');
@@ -51,7 +50,6 @@ $content = '<p>Für die Geocodierung ist ein API Key von <a href="https://www.ge
 
 $content .= '<fieldset>';
 
-
 $formElements = [];
 $n = [];
 $n['field'] = '<input type="text" value="' . $addon->getConfig('geoapifykey') . '" name="geoapifykey" class="form-control">';
@@ -62,8 +60,6 @@ $fragment = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $content .= $fragment->parse('core/form/form.php');
 
-
-
 $formElements = [];
 $n = [];
 $n['label'] = '<label for="osm-geo-table">Tabelle</label>';
@@ -73,8 +69,6 @@ $formElements[] = $n;
 $fragment = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $content .= $fragment->parse('core/form/form.php');
-
-
 
 $formElements = [];
 $n = [];
@@ -89,22 +83,22 @@ $buttons = $fragment->parse('core/form/submit.php');
 $buttonlist = '';
 
 // Links zu Backend-Seiten
-$help_url = \rex_url::backendPage('packages', ["subpage" => "help", "package" => "yform_geo_osm"]);
-$changelog_url = \rex_url::backendPage('packages', ["subpage" => "changelog", "package" => "yform_geo_osm"]);
-$license_url = \rex_url::backendPage('packages', ["subpage" => "license", "package" => "yform_geo_osm"]);
+$help_url = \rex_url::backendPage('packages', ['subpage' => 'help', 'package' => 'yform_geo_osm']);
+$changelog_url = \rex_url::backendPage('packages', ['subpage' => 'changelog', 'package' => 'yform_geo_osm']);
+$license_url = \rex_url::backendPage('packages', ['subpage' => 'license', 'package' => 'yform_geo_osm']);
 
 $buttonlist = '<div class="btn-group" role="group">
-	<a href="'. $help_url .'"
-		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.help') .'</a>
-	<a href="'. $changelog_url .'"
-		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.changelog') .'</a>
-	<a href="'. $license_url .'"
-		class="btn btn-primary btn-sm">'. $addon->i18n('yform_geo_osm.license') .'</a>
+	<a href="' . $help_url . '"
+		class="btn btn-primary btn-sm">' . $addon->i18n('yform_geo_osm.help') . '</a>
+	<a href="' . $changelog_url . '"
+		class="btn btn-primary btn-sm">' . $addon->i18n('yform_geo_osm.changelog') . '</a>
+	<a href="' . $license_url . '"
+		class="btn btn-primary btn-sm">' . $addon->i18n('yform_geo_osm.license') . '</a>
 </div>';
 
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit');
-$fragment->setVar('title', $addon->i18n("yform_geo_osm.batch_geocoding.title"));
+$fragment->setVar('title', $addon->i18n('yform_geo_osm.batch_geocoding.title'));
 $fragment->setVar('options', $buttonlist, false);
 $fragment->setVar('body', $content, false);
 $fragment->setVar('buttons', $buttons, false);
@@ -115,8 +109,7 @@ echo '
         ' . $content . '
     </form>';
 
-
-if ($table) {
+if (null !== $table) {
     $content = '';
     $func = rex_request('geo_func', 'string');
     $field = rex_request('geo_field', 'string');
@@ -124,10 +117,10 @@ if ($table) {
     $geo_sql = \rex_sql::factory();
     //    $geo_sql->setDebug();
 
-    if ($func === 'get_data') {
+    if ('get_data' === $func) {
         $data = [];
         ob_end_clean();
-        if (array_key_exists($field, $fields)) {
+        if (\array_key_exists($field, $fields)) {
             $address_fields = explode(',', $fields[$field]['address']);
             $fs = [];
             foreach ($address_fields as $f) {
@@ -137,14 +130,14 @@ if ($table) {
 
             $pos_fields = explode(',', $fields[$field]['latlng']); // das Element position gibt es nicht
             $pos_field = $fields[$field]['name'];
-            if (count($pos_fields) === 2) {
+            if (2 === \count($pos_fields)) {
                 $pos_lat = $pos_fields[0];
                 $pos_lng = $pos_fields[1];
                 $geo_sql->setQuery('select id, ' . $concat . ' from ' . $table['table_name'] . ' where ' . $pos_lng . '="" or ' . $pos_lng . ' IS NULL or ' . $pos_lat . '="" or ' . $pos_lat . ' IS NULL LIMIT 3000');
-                $data = ($geo_sql->getArray());
+                $data = $geo_sql->getArray();
             } elseif ($pos_field) {
                 $geo_sql->setQuery('select id, ' . $concat . ' from ' . $table['table_name'] . ' where ' . $pos_field . '="" or ' . $pos_field . ' IS NULL LIMIT 3000');
-                $data = ($geo_sql->getArray());
+                $data = $geo_sql->getArray();
             }
         }
         echo json_encode($data);
@@ -152,21 +145,21 @@ if ($table) {
         exit;
     }
 
-    if ($func === 'save_data') {
+    if ('save_data' === $func) {
         ob_end_clean();
         $data = '0';
-        if (array_key_exists($field, $fields)) {
+        if (\array_key_exists($field, $fields)) {
             $data_lng = rex_request('geo_lng', 'string');
             $data_lat = rex_request('geo_lat', 'string');
             $data_id = rex_request('geo_id', 'int', 0);
             $pos_fields = explode(',', $fields[$field]['latlng']);
-            $pos_field = $fields[$field]['name'];
-            if (count($pos_fields) === 2) {
+            $pos_field = $fields[$field]['name'] ?? '';
+            if (2 === \count($pos_fields)) {
                 $pos_lat = $pos_fields[0];
                 $pos_lng = $pos_fields[1];
                 $gd = \rex_sql::factory();
-                $gd->setQuery('select id, ' . $gd->escapeIdentifier($pos_lat) . ', ' . $gd->escapeIdentifier($pos_lng) . ' from ' . $table['table_name'] . ' where id = ' . $gd->escape($data_id) . '');
-                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
+                $gd->setQuery('select id, ' . $gd->escapeIdentifier($pos_lat) . ', ' . $gd->escapeIdentifier($pos_lng) . ' from ' . $table['table_name'] . ' where id = ' . $gd->escape((string) $data_id) . '');
+                if (1 === $gd->getRows() && '' !== $data_lng && '' !== $data_lat) {
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
                     $sd->setWhere('id=' . $data_id);
@@ -175,10 +168,10 @@ if ($table) {
                     $sd->update();
                     $data = '1';
                 }
-            } elseif ($pos_field) {
+            } elseif ('' < $pos_field) {
                 $gd = \rex_sql::factory();
-                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . (string) $gd->escape($data_id));
-                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
+                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . $gd->escape((string) $data_id));
+                if (1 === $gd->getRows() && '' !== $data_lng && '' !== $data_lat) {
                     $geopos = $data_lat . ',' . $data_lng;
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
