@@ -45,6 +45,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     {
         if (null === $this->latField || null === $this->lngField) {
             $geofields = explode(',', str_replace(' ', '', $this->getElement('latlng')));
+            /** @var rex_yform_value_abstract $val */
             foreach ($this->params['values'] as $val) {
                 if ($val->getName() === $geofields[0]) {
                     $this->latField = $val;
@@ -77,9 +78,15 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     public function enterObject(): void
     {
+        /**
+         * STAN: Parameter #2 $callback of function array_filter expects (callable(string): bool)|null, Closure(string): int<0, max> given.
+         * NOTICE: ist valides PHP
+         * @phpstan-ignore-next-line
+         */
         $fields = array_filter(explode(',', $this->getElement('address')), strlen(...));
         $addressfields = [];
-        foreach ($this->params['values'] as $val) {
+            /** @var rex_yform_value_abstract $val */
+            foreach ($this->params['values'] as $val) {
             if (in_array($val->getName(), $fields, true)) {
                 $addressfields[$val->getName()] = $val;
             }
@@ -103,8 +110,9 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         }
 
         // Legacy support for height
+        /** @var string height */
         $height = $this->getElement('height');
-        if (empty($mapAttributes) && $height) {
+        if (0 === count($mapAttributes) && '' < $height) {
             $height = is_numeric($height) ? $height . 'px' : $height;
             $mapAttributes['style'] = 'height: ' . $height;
         }
@@ -130,6 +138,10 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
         return rex_i18n::msg('osm_geocode_description');
     }
 
+    /**
+     * 
+     * @return array<string, mixed> 
+     */
     public function getDefinitions(): array
     {
         return [
@@ -191,6 +203,11 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     {
         // Eingabe in ein Array auflösen und formal bereinigen
         $coord_field_names = array_map(trim(...), explode(',', $value));
+        /**
+         * STAN: Parameter #2 $callback of function array_filter expects (callable(string): bool)|null, Closure(string): int<0, max> given.
+         * NOTICE: ist valides PHP
+         * @phpstan-ignore-next-line
+         */
         $coord_field_names = array_filter($coord_field_names, strlen(...));
         $coord_field_names = array_unique($coord_field_names);
 
@@ -239,12 +256,17 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
      */
     protected function validateAddress(string $field_name, string $value, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
-        if(empty(trim($value))) {
+        if('' < (trim($value))) {
             return false;
         }
 
         // Eingabe in ein Array auflösen und formal bereinigen
         $address_field_names = array_map(trim(...), explode(',', $value));
+        /**
+         * STAN: Parameter #2 $callback of function array_filter expects (callable(string): bool)|null, Closure(string): int<0, max> given.
+         * NOTICE: ist valides PHP
+         * @phpstan-ignore-next-line
+         */
         $address_field_names = array_filter($address_field_names, strlen(...));
         $address_field_names = array_unique($address_field_names);
 
@@ -337,7 +359,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
     protected function validateLayout(array $field_names, array $values, bool $return, rex_yform_validate_customfunction $self, array $fields): bool
     {
         // Prüfen der map_attributes, wenn vorhanden
-        if (!empty($values['map_attributes'])) {
+        if ('' < ($values['map_attributes'])) {
             try {
                 $attributes = json_decode($values['map_attributes'], true, 512, JSON_THROW_ON_ERROR);
                 if (!is_array($attributes)) {
@@ -359,7 +381,7 @@ class rex_yform_value_osm_geocode extends rex_yform_value_abstract
 
         // Prüfen der height, wenn map_attributes nicht gesetzt ist
         $height = $values['height'] ?? '';
-        if (empty($height)) {
+        if ('' < $height) {
             $fields['height']->setValue('400px');
             return false;
         }

@@ -4,6 +4,8 @@
  * @var array<rex_yform_value_abstract> $geofields
  * @var array<string, string> $mapAttributes
  * @var string|null $mapbox_token
+ * 
+ * @var rex_yform_value_osm_geocode $this
  */
 
 $fieldId = $this->getId();
@@ -20,10 +22,8 @@ $lng = $geofields[1]->getFieldId();
 
 // Build HTML attributes string for map div
 $htmlAttributes = '';
-if (!empty($mapAttributes) && is_array($mapAttributes)) {
-    foreach ($mapAttributes as $attr => $value) {
-        $htmlAttributes .= ' ' . rex_escape($attr) . '="' . rex_escape($value) . '"';
-    }
+foreach ($mapAttributes as $attr => $value) {
+    $htmlAttributes .= ' ' . rex_escape($attr) . '="' . rex_escape($value) . '"';
 }
 
 $class_label = 'control-label';
@@ -80,8 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
             lng: '#<?= $lng ?>'
         },
         '<?= $fieldId ?>',
-        <?= $mapbox_token ? json_encode($mapbox_token) : 'null' ?>,
-        <?= !empty($mapAttributes) ? json_encode($mapAttributes) : 'null' ?>
+        <?= null !== $mapbox_token ? json_encode($mapbox_token) : 'null' ?>,
+        <?= count($mapAttributes) === 0 ? json_encode($mapAttributes) : 'null' ?>
     );
 });
 </script>

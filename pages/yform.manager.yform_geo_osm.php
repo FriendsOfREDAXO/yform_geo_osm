@@ -116,7 +116,7 @@ echo '
     </form>';
 
 
-if ($table) {
+if (null !== $table) {
     $content = '';
     $func = rex_request('geo_func', 'string');
     $field = rex_request('geo_field', 'string');
@@ -160,13 +160,13 @@ if ($table) {
             $data_lat = rex_request('geo_lat', 'string');
             $data_id = rex_request('geo_id', 'int', 0);
             $pos_fields = explode(',', $fields[$field]['latlng']);
-            $pos_field = $fields[$field]['name'];
+            $pos_field = isset($fields[$field]['name']) ? $fields[$field]['name'] : '';
             if (count($pos_fields) === 2) {
                 $pos_lat = $pos_fields[0];
                 $pos_lng = $pos_fields[1];
                 $gd = \rex_sql::factory();
-                $gd->setQuery('select id, ' . $gd->escapeIdentifier($pos_lat) . ', ' . $gd->escapeIdentifier($pos_lng) . ' from ' . $table['table_name'] . ' where id = ' . $gd->escape($data_id) . '');
-                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
+                $gd->setQuery('select id, ' . $gd->escapeIdentifier($pos_lat) . ', ' . $gd->escapeIdentifier($pos_lng) . ' from ' . $table['table_name'] . ' where id = ' . $gd->escape((string)$data_id) . '');
+                if ($gd->getRows() === 1 && $data_lng !== '' && $data_lat !== '') {
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
                     $sd->setWhere('id=' . $data_id);
@@ -175,10 +175,10 @@ if ($table) {
                     $sd->update();
                     $data = '1';
                 }
-            } elseif ($pos_field) {
+            } elseif ('' < $pos_field ) {
                 $gd = \rex_sql::factory();
-                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . (string) $gd->escape($data_id));
-                if ($gd->getRows() === 1 && $data_lng != '' && $data_lat != '') {
+                $gd->setQuery('select id from ' . $table['table_name'] . ' where id = ' . $gd->escape((string)$data_id));
+                if ($gd->getRows() === 1 && $data_lng !== '' && $data_lat !== '') {
                     $geopos = $data_lat . ',' . $data_lng;
                     $sd = \rex_sql::factory();
                     $sd->setTable($table['table_name']);
