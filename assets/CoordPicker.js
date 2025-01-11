@@ -104,11 +104,14 @@ class CoordPicker {
         }
 
         this.map = L.map('rex-coord-map').setView([lat, lng], initialWorldView ? 2 : 16);
-        
-        L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(this.map);
 
+        var source = this.map.getContainer().data('layer-source') || '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var sourceAttribution = this.map.getContainer().data('layer-source-attribution') || '© OpenStreetMap contributors';
+
+        L.tileLayer(source, {
+            attribution: sourceAttribution
+        }).addTo(this.map);
+        
         this.marker = L.marker([lat, lng], {
             draggable: true
         }).addTo(this.map);
