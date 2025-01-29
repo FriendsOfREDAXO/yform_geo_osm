@@ -66,11 +66,11 @@ use FriendsOfRedaxo\YFormGeoOsm\Search;
 // Geocoder für Massenverarbeitung initialisieren
 $geocoder = Search::forBulkGeocoding(
     'rex_my_addresses',           // Tabellenname
-    ['street', 'zip', 'city'],    // Adressfelder
+    'street,zip,city',            // Adressfelder
     'latitude',                   // Feld für Breitengrad
     'longitude',                  // Feld für Längengrad
     'your-geoapify-api-key',      // Optional: API Key
-    200                          // Optional: Batch-Größe
+    200                           // Optional: Batch-Größe
 );
 
 // Batch verarbeiten
