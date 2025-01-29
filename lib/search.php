@@ -34,28 +34,42 @@ class Search
         $this->result_lat_field = $settings_result['lat_field'];
         $this->result_lng_field = $settings_result['lng_field'];
     }
-    
+
     /**
      * @api
      * Create instance for bulk geocoding
+     * @param string $table Table name
+     * @param string|array $addressFields Either comma-separated string or array of field names
+     * @param string $latField Latitude field name
+     * @param string $lngField Longitude field name
+     * @param string $apiKey API key (optional)
+     * @param int $batchSize Batch size (optional)
+     * @return self
      */
-    public static function forBulkGeocoding(string $table, string $addressFields, string $latField, string $lngField, string $apiKey = '', $batchSize = 200) : self
+    public static function forBulkGeocoding(string $table, string|array $addressFields, string $latField, string $lngField, string $apiKey = '', $batchSize = 200): self
     {
         $instance = new self(
             ['table' => '', 'lat_field' => '', 'lng_field' => '', 'postalcode_field' => ''],
             ['table' => $table, 'lat_field' => $latField, 'lng_field' => $lngField]
         );
-        $instance->addressFields = $addressFields;
+
+        // Konvertiere Array zu String wenn nötig
+        if (is_array($addressFields)) {
+            $instance->addressFields = $addressFields;
+        } else {
+            // Wandle String in Array um und entferne eventuelle Leerzeichen
+            $instance->addressFields = array_map('trim', explode(',', $addressFields));
+        }
+
         $instance->apiKey = $instance->getApiKey($apiKey);
         $instance->batchSize = $batchSize;
         return $instance;
     }
-
     /**
      * @api
      * Create instance for single address geocoding
      */
-    public static function forGeocoding(string $apiKey = '') : self
+    public static function forGeocoding(string $apiKey = ''): self
     {
         $instance = new self(
             ['table' => '', 'lat_field' => '', 'lng_field' => '', 'postalcode_field' => ''],
@@ -69,7 +83,7 @@ class Search
      * @api
      * Get API key from config if 'config' is passed, otherwise return the provided key
      */
-    private function getApiKey(string $key) : string
+    private function getApiKey(string $key): string
     {
         if ($key === 'config') {
             return rex_addon::get('yform_geo_osm')->getConfig('geoapifykey');
@@ -85,7 +99,7 @@ class Search
      * @param string $postalcode
      * @return array|null ['lat' => float, 'lng' => float]
      */
-    public function geocodeAddress(string $street, string $city, string $postalcode = '') : ?array
+    public function geocodeAddress(string $street, string $city, string $postalcode = ''): ?array
     {
         $address = implode(' ', array_filter([$street, $city, $postalcode]));
         return $this->getCoordinates($address);
@@ -98,20 +112,20 @@ class Search
      * @param string $address Complete address string
      * @return array|null ['lat' => float, 'lng' => float]
      */
-    public function geocode(string $address) : ?array
+    public function geocode(string $address): ?array
     {
         return $this->getCoordinates($address);
     }
 
-    private function getIdByPostalcode(string $postalcode) : int
+    private function getIdByPostalcode(string $postalcode): int
     {
         $sql = rex_sql::factory()->getArray('
             SELECT
-                id,'.$this->postalcode_postalcode_field.'
+                id,' . $this->postalcode_postalcode_field . '
             FROM
-                '.$this->postalcode_table.'
+                ' . $this->postalcode_table . '
             WHERE
-                '.$this->postalcode_postalcode_field.' = :postalcode
+                ' . $this->postalcode_postalcode_field . ' = :postalcode
             LIMIT 0,1
         ', [':postalcode' => $postalcode]);
 
@@ -129,7 +143,7 @@ class Search
      * @param int $radius
      * @return array
      */
-    public function searchByPostalcode(string $postalcode, int $radius) : array
+    public function searchByPostalcode(string $postalcode, int $radius): array
     {
         $id = $this->getIdByPostalcode($postalcode);
 
@@ -137,12 +151,12 @@ class Search
             SELECT 
                 dest.*, 
                 ACOS(
-                     SIN(RADIANS(src.'.$this->postalcode_lat_field.')) * SIN(RADIANS(dest.'.$this->result_lat_field.')) 
-                     + COS(RADIANS(src.'.$this->postalcode_lat_field.')) * COS(RADIANS(dest.'.$this->result_lat_field.'))
-                     * COS(RADIANS(src.'.$this->postalcode_lng_field.') - RADIANS(dest.'.$this->result_lng_field.'))
+                     SIN(RADIANS(src.' . $this->postalcode_lat_field . ')) * SIN(RADIANS(dest.' . $this->result_lat_field . ')) 
+                     + COS(RADIANS(src.' . $this->postalcode_lat_field . ')) * COS(RADIANS(dest.' . $this->result_lat_field . '))
+                     * COS(RADIANS(src.' . $this->postalcode_lng_field . ') - RADIANS(dest.' . $this->result_lng_field . '))
                 ) * 6380 AS distance
-            FROM '.$this->result_table.' dest
-            CROSS JOIN '.$this->postalcode_table.' src
+            FROM ' . $this->result_table . ' dest
+            CROSS JOIN ' . $this->postalcode_table . ' src
             WHERE src.id = :id
             HAVING distance < :distance
             ORDER BY distance', [
@@ -173,7 +187,7 @@ class Search
      * @api
      * @return array
      */
-    public function getUncodedRecords() : array
+    public function getUncodedRecords(): array
     {
         if (!isset($this->addressFields)) {
             throw new Exception('Not configured for bulk geocoding. Use forBulkGeocoding() instead.');
@@ -181,7 +195,7 @@ class Search
 
         $sql = rex_sql::factory();
         $fields = implode(', ', array_merge(['id'], $this->addressFields));
-        
+
         return $sql->getArray(
             "SELECT {$fields} FROM {$this->result_table} 
              WHERE {$this->result_lat_field} = '' OR {$this->result_lat_field} IS NULL 
@@ -198,7 +212,7 @@ class Search
      * @param array $record
      * @return bool
      */
-    public function processRecord(array $record) : bool
+    public function processRecord(array $record): bool
     {
         if (!isset($this->addressFields)) {
             throw new Exception('Not configured for bulk geocoding. Use forBulkGeocoding() instead.');
@@ -229,7 +243,7 @@ class Search
      * @throws rex_sql_exception
      */
 
-    public function processBatch() : array
+    public function processBatch(): array
     {
         if (!isset($this->addressFields)) {
             throw new Exception('Not configured for bulk geocoding. Use forBulkGeocoding() instead.');
@@ -250,7 +264,7 @@ class Search
             } else {
                 $stats['failed']++;
             }
-            
+
             usleep(500000); // 0.5 second delay
         }
 
@@ -265,7 +279,7 @@ class Search
      * @return array|null ['lat' => float, 'lng' => float]
      */
 
-    private function getCoordinates(string $address) : ?array
+    private function getCoordinates(string $address): ?array
     {
         if ($this->apiKey) {
             $url = 'https://api.geoapify.com/v1/geocode/search'
@@ -285,7 +299,7 @@ class Search
         }
 
         $data = json_decode($response, true);
-        
+
         if ($this->apiKey) {
             if (!empty($data['features'][0]['properties'])) {
                 return [
@@ -312,7 +326,7 @@ class Search
      * @param array $coordinates
      * @return bool
      */
-    private function updateRecord(int $id, array $coordinates) : bool
+    private function updateRecord(int $id, array $coordinates): bool
     {
         $sql = rex_sql::factory();
         try {
