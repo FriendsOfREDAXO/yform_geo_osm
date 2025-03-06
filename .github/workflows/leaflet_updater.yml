@@ -1,41 +1,60 @@
 name: Download Latest Leaflet
-
 on:
   workflow_dispatch: # Ermöglicht manuelle Auslösung des Workflows
-
 jobs:
   download_leaflet:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
+      
+      - name: Create Branch
+        run: |
+          BRANCH_NAME="update-leaflet-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+      
       - name: Get Latest Leaflet Version
         id: get_version
         run: |
           LATEST_VERSION=$(curl -s https://api.github.com/repos/Leaflet/Leaflet/releases/latest | jq -r .tag_name)
-          echo "::set-output name=version::$LATEST_VERSION"
-
+          echo "version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+      
       - name: Download Leaflet
         run: |
           LATEST_VERSION="${{ steps.get_version.outputs.version }}"
           echo "Downloading Leaflet version $LATEST_VERSION..."
           curl -L "https://github.com/Leaflet/Leaflet/releases/latest/download/leaflet.zip" -o leaflet.zip
           unzip leaflet.zip
-
+      
       - name: Remove Old Leaflet Directory
         run: |
           if [ -d "assets/leaflet" ]; then
             echo "Deleting old leaflet directory..."
             rm -rf assets/leaflet
           fi
-
+      
       - name: Move Leaflet Files
         run: |
+          mkdir -p assets
           mv dist assets/leaflet
-
-      - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+      
+      - name: Commit Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add assets/leaflet
+          git commit -m "Update Leaflet to ${{ steps.get_version.outputs.version }}"
+          git push origin ${{ env.BRANCH_NAME }}
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
         with:
-          commit_message: "Update Leaflet to ${{ steps.get_version.outputs.version }}"
-          branch: ${{ github.ref }} # Commit auf dem aktuellen Branch
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Update Leaflet to ${{ steps.get_version.outputs.version }}"
+          body: |
+            Automatisches Update von Leaflet auf Version ${{ steps.get_version.outputs.version }}
+            
+            Diese PR wurde automatisch durch den 'Download Latest Leaflet' Workflow erstellt.
+          branch: ${{ env.BRANCH_NAME }}
+          base: ${{ github.ref_name }}
