@@ -220,23 +220,19 @@ Die Karte kann mittels JSON-Attriebute gestaltet und ein wenig konfiguriert werd
 
 MIT-Lizenz, siehe [LICENSE](LICENSE)
 
-## Autoren
+## Autor
 
 **Friends Of REDAXO**
 
-* <http://www.redaxo.org>
-* <https://github.com/FriendsOfREDAXO>
 
-**Project Lead**
+## Credits
 
-[Alexander Walther](https://github.com/alxndr-w)
-
-**Weitere Autoren (2.x)** 
+**Version 2.x** 
 
 * [Thomas Skerbis](https://github.com/skerbis)
 * [Christoph Böcker](https://github.com/christophboecker)
 
-**Weitere Credits (1.x)**
+**Version 1.x**
 
 * Polarpixel – Peter Bickel (Testing / Ideen)
 * Wolfgang Bund – Massencodierung
